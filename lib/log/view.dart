@@ -47,10 +47,14 @@ class LogView extends StatelessWidget {
                       subtitle: Text(dateTimeString(entry.time),
                           style: const TextStyle(fontSize: 10)),
                       trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           if (model.trashMode)
                             InkWell(
-                              onLongPress: () => model.toggleTrash(),
+                              onLongPress: () {
+                                model.toggleTrash();
+                                model.restoreLog(entry.id);
+                              },
                               onTap: () => model.restoreLog(entry.id),
                               child: const Padding(
                                 padding: EdgeInsets.all(8),
