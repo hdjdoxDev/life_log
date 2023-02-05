@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:mypack/core/models/database.dart';
 import 'package:mypack/utils/time.dart';
 import 'package:sqflite/sqflite.dart';
@@ -36,6 +38,8 @@ class LogSqflApi implements ILogApi {
   static const _dbName = 'log.db';
 
   final Database _db;
+  final StreamController<List<LogEntry>> _logEntriesStreamController =
+      StreamController.broadcast();
 
   static Future<LogSqflApi> init() =>
       getDatabasesPath().then((path) => openDatabase(
@@ -55,14 +59,26 @@ class LogSqflApi implements ILogApi {
 
   Future<int> flushAllData() => _db.delete(table.name);
 
-  @override
-  Future<List<LogEntry>> getLogEntries() => _db
+  static Future<List<LogEntry>> _getLogEntries(Database db) => db
       .query(table.name, orderBy: IDatabaseTable.colLastModified)
       .then((value) => value.map((e) => LogEntry.fromTable(e)).toList());
+  @override
+  Future<List<LogEntry>> getLogEntries() => _getLogEntries(_db);
+
+  static Stream<List<LogEntry>> _getLogEntriesStream(Database db) => db
+      .query(table.name, orderBy: IDatabaseTable.colLastModified)
+      .asStream()
+      .map((value) => value.map((e) => LogEntry.fromTable(e)).toList());
+
+  Stream<List<LogEntry>> getLogEntriesStream() => _getLogEntriesStream(_db);
 
   Future<LogEntry> getLogEntry(int id) => _db.query(table.name,
       where: 'id = ?',
       whereArgs: [id]).then((value) => LogEntry.fromTable(value.first));
+
+  Future<T> notifyLogEntries<T>(T ret) => getLogEntries()
+      .then((value) => _logEntriesStreamController.add(value))
+      .then((_) => ret);
 
   static Future<int> _addLogEntry(Database db, LogFields lf) => db.insert(
         table.name,
@@ -74,32 +90,35 @@ class LogSqflApi implements ILogApi {
       );
 
   @override
-  Future<int> addLogEntry(LogFields lf) => _addLogEntry(_db, lf);
+  Future<int> addLogEntry(LogFields lf) =>
+      _addLogEntry(_db, lf).then((value) => notifyLogEntries(value));
 
-  Future deleteLogEntry(int id) =>
-      _db.delete(table.name, where: 'id = ?', whereArgs: [id]);
+  Future deleteLogEntry(int id) => _db.delete(table.name,
+      where: 'id = ?',
+      whereArgs: [id]).then((value) => notifyLogEntries(value));
 
-  Future<int> setDeleted(int id) => getLogEntry(id).then((value) => _db.update(
-        table.name,
-        {
-          ...value
-              .update(LogFields("${ILogApi.delPrefix}${value.msg}"))
-              .toTable(),
-        },
-        where: 'id = ?',
-        whereArgs: [id],
-      ));
-
-  Future<int> restoreTrashed(int id) =>
-      getLogEntry(id).then((value) => _db.update(
+  Future<int> setDeleted(int id) => getLogEntry(id)
+      .then((value) => _db.update(
             table.name,
             {
               ...value
-                  .update(
-                      LogFields(value.msg.substring(ILogApi.delPrefix.length)))
+                  .update(LogFields("${ILogApi.delPrefix}${value.msg}"))
                   .toTable(),
             },
             where: 'id = ?',
             whereArgs: [id],
-          ));
+          ))
+      .then((value) => notifyLogEntries(value));
+
+  Future<int> restoreTrashed(int id) => getLogEntry(id)
+      .then((value) => _db.update(
+          table.name,
+          {
+            ...value
+                .update(value.msg.substring(ILogApi.delPrefix.length))
+                .toTable(),
+          },
+          where: 'id = ?',
+          whereArgs: [id]))
+      .then((value) => notifyLogEntries(value));
 }

@@ -1,11 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:life_log/log/model.dart';
 import 'package:mypack/ui/views/base_view.dart';
 
-import 'package:mypack/utils/time.dart';
-
 import 'trash_viewmodel.dart';
+import 'widgets.dart';
 
 class LogTrashView extends StatelessWidget {
   const LogTrashView({Key? key}) : super(key: key);
@@ -26,9 +25,9 @@ class LogTrashView extends StatelessWidget {
                 dragStartBehavior: DragStartBehavior.down,
                 controller: model.controllerScroll,
                 shrinkWrap: true,
-                itemCount: model.entries.length,
+                itemCount: model.results.length,
                 itemBuilder: (context, index) => LogTrashTile(
-                  entry: model.entries[index],
+                  entry: model.results[index],
                   restoreEntry: model.restoreLog,
                   deleteEntry: model.deleteLog,
                 ),
@@ -43,7 +42,7 @@ class LogTrashView extends StatelessWidget {
             ),
           ),
           InkWell(
-            onDoubleTap: () => model.scrollDown(),
+            onDoubleTap: () => model.goToBottom(),
             child: Column(
               children: [
                 Divider(
@@ -69,68 +68,22 @@ class LogTrashView extends StatelessWidget {
                   style: const TextStyle(color: Colors.white),
                 ),
               )),
-              IconButton(
-                onPressed: () => model.saveLog(),
-                icon: const Icon(Icons.send),
+              LifeIconButton(
+                onTap: () => model.saveLog(),
+                iconData: CupertinoIcons.check_mark,
                 color: Theme.of(context).colorScheme.secondary,
               ),
-              IconButton(
-                icon: const Icon(Icons.search),
+              LifeIconButton(
+                iconData: CupertinoIcons.search,
                 color: model.searching
                     ? Theme.of(context).colorScheme.secondary
                     : Theme.of(context).colorScheme.background,
-                onPressed: () => model.toggleSearch(),
+                onTap: () => model.toggleSearch(),
               ),
             ],
           ),
         ],
       ),
-    );
-  }
-}
-
-class LogTrashTile extends StatelessWidget {
-  final LogEntry entry;
-  final void Function(int) restoreEntry;
-  final void Function(int) deleteEntry;
-  const LogTrashTile({
-    required this.entry,
-    required this.restoreEntry,
-    required this.deleteEntry,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(entry.msg, style: const TextStyle(fontSize: 16)),
-      subtitle: Text(dateTimeString(entry.time),
-          style: const TextStyle(fontSize: 10)),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          InkWell(
-            onLongPress: () {
-              restoreEntry(entry.id);
-              Navigator.pop(context);
-            },
-            onTap: () => restoreEntry(entry.id),
-            child: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.restore),
-            ),
-          ),
-          InkWell(
-            onLongPress: () => Navigator.pop(context),
-            onTap: () => deleteEntry(entry.id),
-            child: const Padding(
-              padding: EdgeInsets.all(8),
-              child: Icon(Icons.delete),
-            ),
-          )
-        ],
-      ),
-      iconColor: Theme.of(context).colorScheme.secondary,
     );
   }
 }

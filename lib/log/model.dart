@@ -33,11 +33,11 @@ class LogEntry extends LogFields implements ISqflEntry {
   @override
   LogFields get fields => this;
 
-  LogEntry(LogFields sf, id, exportId, lastModified)
+  LogEntry({msg, id, exportId, lastModified})
       : _id = id,
         _exportId = exportId,
         _lastModified = lastModified,
-        super(sf.msg);
+        super(msg);
 
   LogEntry.fromTable(Map<String, dynamic> map)
       : _id = map[IDatabaseTable.colId],
@@ -55,8 +55,15 @@ class LogEntry extends LogFields implements ISqflEntry {
 
   DateTime? get time => DateTime.fromMillisecondsSinceEpoch(_lastModified);
 
-  LogEntry update(LogFields fields) {
-    msg = fields.msg;
+  LogEntry update(dynamic fields) {
+    if (fields is LogFields) {
+      msg = fields.msg;
+    } else if (fields is Map<String, dynamic> &&
+        fields.containsKey(LogSqflTable.colMsg)) {
+      msg = fields[LogSqflTable.colMsg];
+    } else if (fields is String) {
+      msg = fields;
+    }
     return this;
   }
 }
