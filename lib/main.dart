@@ -27,6 +27,7 @@ class LifeLogApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const LogView(),
+          '/trash':(context) => const LogTrashView(),
         });
   }
 }

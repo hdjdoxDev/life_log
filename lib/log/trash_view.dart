@@ -1,17 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:mypack/ui/shared/layout.dart';
 import 'package:mypack/ui/views/base_view.dart';
 
 import 'package:mypack/utils/time.dart';
 
 import 'viewmodel.dart';
 
-class LogView extends StatelessWidget {
-  const LogView({Key? key}) : super(key: key);
+class LogTrashView extends StatelessWidget {
+  const LogTrashView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return BaseView<LogModel>(
+    return CustomView<LogModel>(
       onModelReady: (model) => model.loadModel(),
       builder: (context, model, _) => Scaffold(
         appBar: TappableAppBar(
@@ -31,7 +32,6 @@ class LogView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Expanded(
-              flex: 6,
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: ListView.separated(
@@ -49,6 +49,17 @@ class LogView extends StatelessWidget {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          InkWell(
+                            onLongPress: () {
+                              model.toggleTrash();
+                              model.restoreLog(entry.id);
+                            },
+                            onTap: () => model.restoreLog(entry.id),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Icon(Icons.restore),
+                            ),
+                          ),
                           InkWell(
                             onLongPress: () => model.toggleTrash(),
                             onTap: () => model.deleteLog(entry.id),
