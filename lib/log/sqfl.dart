@@ -90,14 +90,16 @@ class LogSqflApi implements ILogApi {
         whereArgs: [id],
       ));
 
-  Future<int> resetDeleted(int id) => getLogEntry(id).then((value) => _db.update(
-        table.name,
-        {
-          ...value
-              .update(LogFields(value.msg.substring(ILogApi.delPrefix.length)))
-              .toTable(),
-        },
-        where: 'id = ?',
-        whereArgs: [id],
-      ));
+  Future<int> restoreTrashed(int id) =>
+      getLogEntry(id).then((value) => _db.update(
+            table.name,
+            {
+              ...value
+                  .update(
+                      LogFields(value.msg.substring(ILogApi.delPrefix.length)))
+                  .toTable(),
+            },
+            where: 'id = ?',
+            whereArgs: [id],
+          ));
 }

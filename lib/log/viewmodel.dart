@@ -92,32 +92,10 @@ class LogModel extends BaseModel {
     notifyListeners();
   }
 
-  Future deleteLog(int id) {
-    if (_trashMode) {
-      return _api
-          .deleteLogEntry(id)
-          .then((value) => _entries.removeWhere((element) => element.id == id))
-          .then((value) => notifyListeners());
-    }
-    return _api
-        .setDeleted(id)
-        .then((value) => _entries.where((element) => element.id == id))
-        .then((e) => e.first)
-        .then((val) => val.msg = "${ILogApi.delPrefix}${val.msg}")
-        .then((value) => notifyListeners());
-  }
-
-  void toggleTrash() {
-    _trashMode = !_trashMode;
-    notifyListeners();
-  }
-
-  Future restoreLog(int id) {
-    return _api
-        .resetDeleted(id)
-        .then((value) => _entries.where((element) => element.id == id))
-        .then((e) => e.first)
-        .then((val) => val.msg = val.msg.substring(ILogApi.delPrefix.length))
-        .then((value) => notifyListeners());
-  }
+  Future trashLog(int id) => _api
+      .setDeleted(id)
+      .then((value) => _entries.where((element) => element.id == id))
+      .then((e) => e.first)
+      .then((val) => val.msg = "${ILogApi.delPrefix}${val.msg}")
+      .then((value) => notifyListeners());
 }

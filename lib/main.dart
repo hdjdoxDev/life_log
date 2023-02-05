@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'locator.dart';
+import 'log/trash_view.dart';
 import 'log/view.dart';
 
 void main() {
@@ -24,10 +25,10 @@ class LifeLogApp extends StatelessWidget {
             secondary: Colors.yellow,
           ),
         ),
-        initialRoute: '/',
+        initialRoute: '/log',
         routes: {
-          '/': (context) => const LogView(),
-          '/trash':(context) => const LogTrashView(),
+          '/log': (context) => const LogView(),
+          '/log/trash':(context) => const LogTrashView(),
         });
   }
 }

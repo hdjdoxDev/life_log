@@ -7,23 +7,20 @@ import 'package:mypack/utils/time.dart';
 import 'sqfl.dart';
 import 'model.dart';
 
-class LogModel extends BaseModel {
+class LogTrashModel extends BaseModel {
   late final LogSqflApi _api;
   // variables
   TextEditingController controller = TextEditingController();
   bool _searching = false;
-  bool _trashMode = false;
   get searching => _searching;
   List<LogEntry> _entries = [];
   String query = "";
   List<LogEntry> get entries => _entries
       .where((e) => e.msg.contains(query))
-      .where((e) => _trashMode == e.msg.startsWith(ILogApi.delPrefix))
+      .where((e) => e.msg.startsWith(ILogApi.delPrefix))
       .toList();
 
   ScrollController controllerScroll = ScrollController();
-
-  get trashMode => _trashMode;
 
   // load
   @override
@@ -92,32 +89,15 @@ class LogModel extends BaseModel {
     notifyListeners();
   }
 
-  Future deleteLog(int id) {
-    if (_trashMode) {
-      return _api
-          .deleteLogEntry(id)
-          .then((value) => _entries.removeWhere((element) => element.id == id))
-          .then((value) => notifyListeners());
-    }
-    return _api
-        .setDeleted(id)
-        .then((value) => _entries.where((element) => element.id == id))
-        .then((e) => e.first)
-        .then((val) => val.msg = "${ILogApi.delPrefix}${val.msg}")
-        .then((value) => notifyListeners());
-  }
+  Future deleteLog(int id) => _api
+      .deleteLogEntry(id)
+      .then((value) => _entries.removeWhere((element) => element.id == id))
+      .then((value) => notifyListeners());
 
-  void toggleTrash() {
-    _trashMode = !_trashMode;
-    notifyListeners();
-  }
-
-  Future restoreLog(int id) {
-    return _api
-        .resetDeleted(id)
-        .then((value) => _entries.where((element) => element.id == id))
-        .then((e) => e.first)
-        .then((val) => val.msg = val.msg.substring(ILogApi.delPrefix.length))
-        .then((value) => notifyListeners());
-  }
+  Future restoreLog(int id) => _api
+      .restoreTrashed(id)
+      .then((value) => _entries.where((element) => element.id == id))
+      .then((e) => e.first)
+      .then((val) => val.msg = val.msg.substring(ILogApi.delPrefix.length))
+      .then((value) => notifyListeners());
 }
