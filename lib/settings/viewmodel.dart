@@ -4,32 +4,41 @@ import 'package:flutter/material.dart';
 import 'package:mypack/core/enums/viewstate.dart';
 import 'package:mypack/core/viewmodels/base_viewmodel.dart';
 import 'package:mypack/locator.dart';
+import 'package:mypack/utils/time.dart';
+import '../login/viewmodel.dart';
 import 'model.dart';
 import 'sqfl.dart';
 
 class SettingsModel extends BaseModel {
   static const MaterialColor defaultColor = Colors.yellow;
   static const int defaultColorIndex = 3;
+  static final StreamController<Color> _mainColorStreamController =
+      StreamController.broadcast();
+  static const String settingMsg = "setting";
+
+  static Stream<Color> get mainColorStream => _mainColorStreamController.stream;
+
+  // settings
   @protected
   late final SettingsSqflApi settingApi;
   late Stream<List<SettingsEntry>> settingsEntryStream;
-
   late List<SettingsEntry> _settings;
-  static final StreamController<Color> _mainColorStreamController =
-      StreamController.broadcast();
+  late int _colorIndex;
+  late int _totalEntries;
+  late int _trashedEntries;
+  late String _user;
+  late String _pass;
+  late bool _logged;
+  final controller = TextEditingController();
 
-  static Stream<Color> get mainColorStream => _mainColorStreamController.stream;
   Color get mainColor => colors[colorIndex];
-  get colorIndex =>
-      _settings.where((e) => e.name == ISettingsApi.colorName).first.msg;
-  get totalEntries =>
-      _settings.where((e) => e.name == ISettingsApi.totalName).first.msg;
-  get trashedEntries =>
-      _settings.where((e) => e.name == ISettingsApi.trashName).first.msg;
-  get user => _settings.where((e) => e.name == ISettingsApi.userName).first.msg;
-  get pass => _settings.where((e) => e.name == ISettingsApi.passName).first.msg;
+  int get colorIndex => _colorIndex;
+  int get totalEntries => _totalEntries;
+  int get trashedEntries => _trashedEntries;
+  String get user => _user;
+  String get pass => _pass;
+  bool get logged => _logged;
 
-  get controllerScroll => ScrollController();
   // load
   @override
   Future loadModel() async {
@@ -41,6 +50,40 @@ class SettingsModel extends BaseModel {
     settingsEntryStream = settingApi.getSettingsEntriesStream();
     settingsEntryStream.listen(listener);
     setState(ViewState.idle);
+  }
+
+  void listener(List<SettingsEntry> settings) async {
+    _settings = settings;
+    _colorIndex =
+        getColorIndexIfValid(ISettingsApi.colorName) ?? defaultColorIndex;
+    _totalEntries = getIntIfValid(ISettingsApi.totalName) ?? 0;
+    _trashedEntries = getIntIfValid(ISettingsApi.trashName) ?? 0;
+    _user = (_settings.where((e) => e.name == ISettingsApi.userName).isNotEmpty)
+        ? _settings.where((e) => e.name == ISettingsApi.userName).first.msg
+        : LoginModel.defaultUser;
+    _pass = _settings.where((e) => e.name == ISettingsApi.passName).isNotEmpty
+        ? _settings.where((e) => e.name == ISettingsApi.passName).first.msg
+        : LoginModel.defaultPass;
+    _logged = _settings
+            .where((e) => e.name == ISettingsApi.loggedName)
+            .isNotEmpty
+        ? _settings.where((e) => e.name == ISettingsApi.loggedName).first.msg !=
+            "0"
+        : false;
+    notifyListeners();
+  }
+
+  int? getIntIfValid(String name, {List<SettingsEntry>? results}) {
+    var val = int.tryParse((results ?? _settings)
+        .firstWhere((e) => e.name == ISettingsApi.colorName,
+            orElse: () => SettingsEntry(
+                id: 0,
+                lastModified: now.millisecondsSinceEpoch,
+                exportId: null,
+                name: ISettingsApi.colorName,
+                msg: "$defaultColorIndex"))
+        .msg);
+    return val;
   }
 
   static List<MaterialColor> get colors => [
@@ -58,23 +101,12 @@ class SettingsModel extends BaseModel {
         Colors.brown,
         Colors.grey
       ];
-
   int get totColors => colors.length;
-
-  void listener(List<SettingsEntry> settings) async {
-    _settings = settings;
-
-    notifyListeners();
-  }
-
   bool findSomeColors(List<SettingsEntry> results) =>
       results.where((e) => e.msg.startsWith(ISettingsApi.colorName)).isNotEmpty;
 
-  int? lastIfValid(List<SettingsEntry> results) {
-    var val = int.tryParse(results
-        .lastWhere((e) => e.msg.startsWith(ISettingsApi.colorName))
-        .msg
-        .substring(ISettingsApi.colorName.length));
+  int? getColorIndexIfValid(String name, {List<SettingsEntry>? results}) {
+    var val = getIntIfValid(ISettingsApi.colorName, results: results);
     if (val != null && val >= 0 && val < colors.length) return val;
     return null;
   }
@@ -103,7 +135,28 @@ class SettingsModel extends BaseModel {
     return "yellow";
   }
 
-  getColor(int? i) => colors[i ?? colorIndex];
+  getColor(int? i) =>
+      colors[i != null && i >= 0 && i < totColors ? i : colorIndex];
 
   String niceColor(int i) => nice(colors[i].value);
+
+  getInput() {
+    var text = controller.text;
+    if (!text.contains(", ")) return;
+    var name = text.split(", ").first;
+    var msg = text.split(", ").last;
+    if (name == ISettingsApi.colorName) {
+      var color = getColor(int.tryParse(msg));
+      setMainColor(color: color);
+    } else if (name == ISettingsApi.userName) {
+      settingApi.setSetting(ISettingsApi.userName, msg);
+    } else if (name == ISettingsApi.passName) {
+      settingApi.setSetting(ISettingsApi.passName, msg);
+    } else if (name == ISettingsApi.totalName) {
+    } else if (name == ISettingsApi.trashName) {
+    } else {
+      settingApi.setSetting(name, msg);
+    }
+    controller.clear();
+  }
 }

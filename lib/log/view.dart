@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:mypack/locator.dart';
 import 'package:mypack/ui/views/base_view.dart';
 
+import '../login/viewmodel.dart';
+import '../settings/viewmodel.dart';
 import 'viewmodel.dart';
 import 'widgets.dart';
 
@@ -24,7 +27,6 @@ class LogView extends StatelessWidget {
       builder: (context, model, _) => Column(
         children: [
           Expanded(
-            flex: 6,
             child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SingleChildScrollView(
@@ -39,7 +41,7 @@ class LogView extends StatelessWidget {
                               trashEntry: model.trashLog,
                               copyEntry: model.copyLog,
                             ),
-                            if (i < model.results.length)
+                            if (i < model.results.length - 1)
                               Divider(
                                 color: Theme.of(context).colorScheme.secondary,
                                 indent: 16,
@@ -81,7 +83,16 @@ class LogView extends StatelessWidget {
                 ),
               )),
               LifeIconButton(
-                onTap: () => model.saveLog(),
+                onTap: () {
+                  if (LoginModel.logOutMsgs.contains(model.controller.text)) {
+                    locator.get<LoginModel>().logOut();
+                  } else if (model.controller.text ==
+                      SettingsModel.settingMsg) {
+                    Navigator.pushNamed(context, '/settings');
+                  } else {
+                    model.saveLog();
+                  }
+                },
                 iconData: CupertinoIcons.check_mark,
                 color: Theme.of(context).colorScheme.secondary,
               ),

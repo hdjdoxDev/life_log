@@ -30,7 +30,7 @@ class LoginView extends StatelessWidget {
                               entry: model.logs[i],
                               copyEntry: model.copyLog,
                             ),
-                            if (i < model.logs.length)
+                            if (i < model.logs.length - 1)
                               Divider(
                                 color: Theme.of(context).colorScheme.secondary,
                                 indent: 16,
@@ -72,8 +72,7 @@ class LoginView extends StatelessWidget {
                 ),
               )),
               LifeIconButton(
-                onTap: () => model.getInput(
-                    () => Navigator.pushReplacementNamed(context, '/log')),
+                onTap: () => model.getInput(),
                 iconData: CupertinoIcons.check_mark,
                 color: Theme.of(context).colorScheme.secondary,
               ),

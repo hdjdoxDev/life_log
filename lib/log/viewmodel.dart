@@ -7,6 +7,14 @@ import 'sqfl.dart';
 import 'model.dart';
 
 class LogModel extends IScrollableModel {
+  static const List<String> backMsgs = [
+    "back",
+    "main",
+    "home",
+    "menu",
+    "exit",
+  ];
+
   @protected
   late final LogSqflApi api;
   @protected
@@ -42,9 +50,6 @@ class LogModel extends IScrollableModel {
     goToBottom(delay: 100);
     notifyListeners();
   }
-
-  // Future<List<LogEntry>> loadEntries() async =>
-  //     entries = await api.getLogEntries();
 
   Future<int> saveLog() async {
     var ret = await api.addLogEntry(LogFields(controller.text));

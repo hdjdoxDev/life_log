@@ -4,7 +4,7 @@ import 'package:mypack/core/viewmodels/base_viewmodel.dart';
 abstract class IScrollableModel extends BaseModel {
   ScrollController controllerScroll = ScrollController();
 
-  void goToBottom({int delay = 100, int duration = 500, int threshold = 150}) =>
+  void goToBottom({int delay = 100, int duration = 500, int threshold = 500}) =>
       controllerScroll.hasClients
           ? _goToBottom(delay: delay, duration: duration, threshold: threshold)
           : null;

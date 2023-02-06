@@ -46,7 +46,10 @@ class SettingsEntry extends SettingsFields implements ISqflEntry {
       : _id = map[IDatabaseTable.colId],
         _lastModified = map[IDatabaseTable.colLastModified],
         _exportId = map[IDatabaseTable.colExportId],
-        super(map[SettingsSqflTable.colName], map[SettingsSqflTable.colMsg]);
+        super(
+          map[SettingsSqflTable.colName],
+          map[SettingsSqflTable.colMsg],
+        );
 
   @override
   Map<String, Object?> toTable() => {
@@ -76,12 +79,6 @@ class SettingsEntry extends SettingsFields implements ISqflEntry {
 }
 
 abstract class ISettingsApi {
-  /// Get all Settings entries
-  Future<List<SettingsEntry>> getSettingsEntries();
-
-  /// Add a Settings entry
-  Future<int> addSettingsEntry(SettingsEntry entry);
-
   static const String colorName = "color";
   static const String userName = "user";
   static const String passName = "pass";
@@ -89,4 +86,5 @@ abstract class ISettingsApi {
   static const String portName = "port";
   static const String totalName = "total";
   static const String trashName = "trash";
+  static const String loggedName = "logged";
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mypack/ui/views/base_view.dart';
 
 import 'locator.dart';
 import 'log/trash_view.dart';
@@ -18,25 +19,27 @@ class LifeLogApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Color?>(
-      stream: SettingsModel.mainColorStream,
-      builder: (context, stream) => MaterialApp(
+    return BaseView<SettingsModel>(
+      onModelReady: (model) => model.loadModel(),
+      loading: MaterialApp(routes: {'/': (context) => const LogoView()}),
+      builder: (context, model, _) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'LifeLog',
         theme: ThemeData(
           fontFamily: "RobotoMono",
           colorScheme: ColorScheme.dark(
             primary: Colors.white,
-            secondary: stream.data ?? SettingsModel.defaultColor,
+            secondary: model.getColor(null) ?? SettingsModel.defaultColor,
           ),
         ),
         initialRoute: '/',
         routes: {
           '/': (context) => const LogoView(),
-          '/log': (context) => const LogView(),
+          '/log': (context) =>
+              model.logged ? const LogView() : const LoginView(),
           '/log/trash': (context) => const LogTrashView(),
           '/settings': (context) => const SettingsView(),
-          '/login': (context) => const LoginView(),
+          // '/login': (context) => const LoginView(),
         },
       ),
     );

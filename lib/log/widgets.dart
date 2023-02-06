@@ -115,17 +115,13 @@ class LifeIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(shape: BoxShape.circle),
-      padding: const EdgeInsets.all(10),
-      child: InkWell(
-        onLongPress: onLongPress,
-        onTap: onTap,
-        child: Container(
-          decoration: const BoxDecoration(shape: BoxShape.circle),
-          padding: const EdgeInsets.all(10),
-          child: Icon(iconData, color: color),
-        ),
+    return InkWell(
+      onLongPress: onLongPress,
+      onTap: onTap,
+      child: Container(
+        decoration: const BoxDecoration(shape: BoxShape.circle),
+        padding: const EdgeInsets.all(10),
+        child: Icon(iconData, color: color),
       ),
     );
   }
