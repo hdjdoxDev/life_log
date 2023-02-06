@@ -33,7 +33,11 @@ class LogEntry extends LogFields implements ISqflEntry {
   @override
   LogFields get fields => this;
 
-  LogEntry({msg, id, exportId, lastModified})
+  LogEntry(
+      {required String msg,
+      required id,
+      int? exportId,
+      required int lastModified})
       : _id = id,
         _exportId = exportId,
         _lastModified = lastModified,

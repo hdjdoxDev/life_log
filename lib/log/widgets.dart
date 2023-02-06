@@ -4,16 +4,38 @@ import 'package:mypack/utils/time.dart';
 
 import 'model.dart';
 
-class LogTile extends StatelessWidget {
+class LoginTile extends StatelessWidget {
+  const LoginTile({
+    required this.entry,
+    required this.copyEntry,
+    super.key,
+  });
+  final void Function(String) copyEntry;
   final LogEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onHorizontalDragEnd: (details) => copyEntry(entry.msg),
+      child: ListTile(
+        title: Text(entry.msg, style: const TextStyle(fontSize: 16)),
+        subtitle: Text(dateTimeString(entry.time),
+            style: const TextStyle(fontSize: 10)),
+      ),
+    );
+  }
+}
+
+class LogTile extends StatelessWidget {
   final void Function(int) trashEntry;
   final void Function(String) copyEntry;
+  final LogEntry entry;
 
   const LogTile({
     required this.entry,
+    required this.copyEntry,
     required this.trashEntry,
     super.key,
-    required this.copyEntry,
   });
   @override
   Widget build(BuildContext context) {
@@ -23,16 +45,11 @@ class LogTile extends StatelessWidget {
         title: Text(entry.msg, style: const TextStyle(fontSize: 16)),
         subtitle: Text(dateTimeString(entry.time),
             style: const TextStyle(fontSize: 10)),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            LifeIconButton(
-              color: Theme.of(context).colorScheme.secondary,
-              iconData: CupertinoIcons.delete,
-              onLongPress: () => Navigator.pushNamed(context, '/log/trash'),
-              onTap: () => trashEntry(entry.id),
-            ),
-          ],
+        trailing: LifeIconButton(
+          color: Theme.of(context).colorScheme.secondary,
+          iconData: CupertinoIcons.delete,
+          onLongPress: () => Navigator.pushNamed(context, '/log/trash'),
+          onTap: () => trashEntry(entry.id),
         ),
       ),
     );
@@ -98,12 +115,17 @@ class LifeIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onLongPress: onLongPress,
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: Icon(iconData, color: color),
+    return Container(
+      decoration: const BoxDecoration(shape: BoxShape.circle),
+      padding: const EdgeInsets.all(10),
+      child: InkWell(
+        onLongPress: onLongPress,
+        onTap: onTap,
+        child: Container(
+          decoration: const BoxDecoration(shape: BoxShape.circle),
+          padding: const EdgeInsets.all(10),
+          child: Icon(iconData, color: color),
+        ),
       ),
     );
   }

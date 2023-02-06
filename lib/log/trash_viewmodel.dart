@@ -11,5 +11,5 @@ class LogTrashModel extends LogModel {
 
   Future deleteLog(int id) => api.deleteLogEntry(id);
 
-  Future restoreLog(int id) => api.restoreTrashed(id);
+  Future restoreLog(int id) => api.restoreFromTrash(id);
 }

@@ -62,15 +62,14 @@ class LogSqflApi implements ILogApi {
   static Future<List<LogEntry>> _getLogEntries(Database db) => db
       .query(table.name, orderBy: IDatabaseTable.colLastModified)
       .then((value) => value.map((e) => LogEntry.fromTable(e)).toList());
+
   @override
   Future<List<LogEntry>> getLogEntries() => _getLogEntries(_db);
 
-  static Stream<List<LogEntry>> _getLogEntriesStream(Database db) => db
-      .query(table.name, orderBy: IDatabaseTable.colLastModified)
-      .asStream()
-      .map((value) => value.map((e) => LogEntry.fromTable(e)).toList());
-
-  Stream<List<LogEntry>> getLogEntriesStream() => _getLogEntriesStream(_db);
+  Stream<List<LogEntry>> getLogEntriesStream() {
+    getLogEntries().then((value) => _logEntriesStreamController.add(value));
+    return _logEntriesStreamController.stream;
+  }
 
   Future<LogEntry> getLogEntry(int id) => _db.query(table.name,
       where: 'id = ?',
@@ -97,7 +96,7 @@ class LogSqflApi implements ILogApi {
       where: 'id = ?',
       whereArgs: [id]).then((value) => notifyLogEntries(value));
 
-  Future<int> setDeleted(int id) => getLogEntry(id)
+  Future<int> moveToTrash(int id) => getLogEntry(id)
       .then((value) => _db.update(
             table.name,
             {
@@ -110,7 +109,7 @@ class LogSqflApi implements ILogApi {
           ))
       .then((value) => notifyLogEntries(value));
 
-  Future<int> restoreTrashed(int id) => getLogEntry(id)
+  Future<int> restoreFromTrash(int id) => getLogEntry(id)
       .then((value) => _db.update(
           table.name,
           {

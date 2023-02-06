@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:life_log/model.dart';
 import 'package:mypack/core/enums/viewstate.dart';
-import 'package:mypack/core/viewmodels/base_viewmodel.dart';
 import 'package:mypack/locator.dart';
 
 import 'sqfl.dart';
 import 'model.dart';
 
-class LogModel extends BaseModel {
+class LogModel extends IScrollableModel {
   @protected
   late final LogSqflApi api;
   @protected
@@ -24,8 +24,6 @@ class LogModel extends BaseModel {
       .where((e) => !e.msg.startsWith(ILogApi.delPrefix))
       .toList();
 
-  ScrollController controllerScroll = ScrollController();
-
   // load
   @override
   Future loadModel() async {
@@ -41,41 +39,12 @@ class LogModel extends BaseModel {
 
   void listener(List<LogEntry> logs) {
     entries = logs;
-    goToBottom();
+    goToBottom(delay: 100);
     notifyListeners();
   }
 
   // Future<List<LogEntry>> loadEntries() async =>
   //     entries = await api.getLogEntries();
-  
-  void goToBottom({int delay = 50, int duration = 500, int threshold = 150}) =>
-      controllerScroll.position.maxScrollExtent - controllerScroll.offset >
-              threshold
-          ? scrollDown(mill: duration, delay: delay)
-          : moveDown(delay: delay);
-  void moveDown({int delay = 50}) => Future.delayed(
-      Duration(milliseconds: delay),
-      () => controllerScroll.jumpTo(controllerScroll.position.maxScrollExtent));
-
-  void scrollDown({int mill = 500, int delay = 50}) async => Future.delayed(
-      Duration(milliseconds: delay),
-      () => controllerScroll.animateTo(
-            controllerScroll.position.maxScrollExtent,
-            duration: Duration(
-              milliseconds: mill,
-            ),
-            curve: Curves.decelerate,
-          ));
-
-  void scrollUp() async => Future.delayed(
-      const Duration(milliseconds: 50),
-      () => controllerScroll.animateTo(
-            0,
-            duration: const Duration(
-              milliseconds: 500,
-            ),
-            curve: Curves.easeInOut,
-          ));
 
   Future<int> saveLog() async {
     var ret = await api.addLogEntry(LogFields(controller.text));
@@ -91,15 +60,20 @@ class LogModel extends BaseModel {
     } else {
       controller.removeListener(search);
     }
+    goToBottom();
     notifyListeners();
   }
 
   void search() {
     query = controller.text;
+    goToBottom();
     notifyListeners();
   }
 
-  Future trashLog(int id) => api.setDeleted(id);
+  Future trashLog(int id) => api.moveToTrash(id);
 
-  void copyLog(String msg) => controller.text = msg;
+  void copyLog(String msg) => controller
+    ..text = msg
+    ..selection = TextSelection.fromPosition(
+        TextPosition(offset: controller.text.length));
 }

@@ -2,25 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mypack/ui/views/base_view.dart';
 
+import '../log/widgets.dart';
 import 'viewmodel.dart';
-import 'widgets.dart';
 
-class LogView extends StatelessWidget {
-  const LogView({Key? key}) : super(key: key);
+class LoginView extends StatelessWidget {
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return CustomView<LogModel>(
-      actions: [
-        LifeIconButton(
-          iconData: CupertinoIcons.settings,
-          onTap: () => Navigator.pushNamed(context, '/settings'),
-          color: Theme.of(context).colorScheme.background,
-        ),
-      ],
+    return CustomView<LoginModel>(
       onModelReady: (model) => model.loadModel(),
-      onDoubleTapBar: (model) => model.scrollUp(),
-      title: "LifeLog",
+      title: "LifeLog - Login",
       builder: (context, model, _) => Column(
         children: [
           Expanded(
@@ -31,15 +23,14 @@ class LogView extends StatelessWidget {
                   controller: model.controllerScroll,
                   child: Column(
                     children: [
-                      for (var i = 0; i < model.results.length; i++)
+                      for (var i = 0; i < model.logs.length; i++)
                         Column(
                           children: [
-                            LogTile(
-                              entry: model.results[i],
-                              trashEntry: model.trashLog,
+                            LoginTile(
+                              entry: model.logs[i],
                               copyEntry: model.copyLog,
                             ),
-                            if (i < model.results.length)
+                            if (i < model.logs.length)
                               Divider(
                                 color: Theme.of(context).colorScheme.secondary,
                                 indent: 16,
@@ -81,16 +72,10 @@ class LogView extends StatelessWidget {
                 ),
               )),
               LifeIconButton(
-                onTap: () => model.saveLog(),
+                onTap: () => model.getInput(
+                    () => Navigator.pushReplacementNamed(context, '/log')),
                 iconData: CupertinoIcons.check_mark,
                 color: Theme.of(context).colorScheme.secondary,
-              ),
-              LifeIconButton(
-                color: model.searching
-                    ? Theme.of(context).colorScheme.secondary
-                    : Theme.of(context).colorScheme.background,
-                iconData: CupertinoIcons.search,
-                onTap: () => model.toggleSearch(),
               ),
             ],
           ),
