@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:life_log/settings/sqfl.dart';
 import 'package:mypack/core/models/database.dart';
+import 'package:mypack/locator.dart';
 import 'package:mypack/utils/time.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
@@ -75,9 +77,17 @@ class LogSqflApi implements ILogApi {
       where: 'id = ?',
       whereArgs: [id]).then((value) => LogEntry.fromTable(value.first));
 
-  Future<T> notifyLogEntries<T>(T ret) => getLogEntries()
-      .then((value) => _logEntriesStreamController.add(value))
-      .then((_) => ret);
+  Future<T> notifyLogEntries<T>(T ret) async {
+    await getLogEntries().then((value) async {
+      _logEntriesStreamController.add(value);
+      await locator.isReady<SettingsSqflApi>();
+      var trashEntries =
+          value.where((e) => e.msg.startsWith(ILogApi.delPrefix)).length;
+      locator<SettingsSqflApi>().setTotal(value.length - trashEntries);
+      locator<SettingsSqflApi>().setTrash(trashEntries);
+    });
+    return ret;
+  }
 
   static Future<int> _addLogEntry(Database db, LogFields lf) => db.insert(
         table.name,

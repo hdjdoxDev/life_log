@@ -120,4 +120,13 @@ class SettingsSqflApi implements ISettingsApi {
   Future<int> setLoggedIn() => setSetting(ISettingsApi.loggedName, "1");
 
   Future<int> setLoggedOut() => setSetting(ISettingsApi.loggedName, "0");
+
+  Future<int> setTotal(int total) => setSetting(ISettingsApi.totalName, "$total");
+
+  Future<int> setTrash(int trash) => setSetting(ISettingsApi.trashName, "$trash");
+
+  Future<int> setUserName(String name) =>
+      setSetting(ISettingsApi.userName, name);
+
+      
 }
