@@ -68,7 +68,6 @@ class SettingsSqflApi implements ISettingsApi {
       .query(table.name, orderBy: IDatabaseTable.colLastModified)
       .then((value) => value.map((e) => SettingsEntry.fromTable(e)).toList());
 
-  @override
   Future<List<SettingsEntry>> getSettingsEntries() => _getSettingsEntries(_db);
 
   Stream<List<SettingsEntry>> getSettingsEntriesStream() {

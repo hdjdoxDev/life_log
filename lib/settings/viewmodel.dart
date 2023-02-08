@@ -14,7 +14,7 @@ class SettingsModel extends BaseModel {
   static const int defaultColorIndex = 3;
   static final StreamController<Color> _mainColorStreamController =
       StreamController.broadcast();
-  static const String settingMsg = "setting";
+  static const String settingsMsg = "setting";
 
   static Stream<Color> get mainColorStream => _mainColorStreamController.stream;
 

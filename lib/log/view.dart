@@ -87,7 +87,7 @@ class LogView extends StatelessWidget {
                   if (LoginModel.logOutMsgs.contains(model.controller.text)) {
                     locator.get<LoginModel>().logOut();
                   } else if (model.controller.text ==
-                      SettingsModel.settingMsg) {
+                      SettingsModel.settingsMsg) {
                     Navigator.pushNamed(context, '/settings');
                   } else {
                     model.saveLog();

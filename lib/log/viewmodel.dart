@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:life_log/login/viewmodel.dart';
 import 'package:life_log/model.dart';
+import 'package:life_log/settings/sqfl.dart';
 import 'package:mypack/core/enums/viewstate.dart';
 import 'package:mypack/locator.dart';
 
@@ -52,6 +54,10 @@ class LogModel extends IScrollableModel {
   }
 
   Future<int> saveLog() async {
+    if (LoginModel.logOutMsgs.contains(controller.text)) {
+      await locator<SettingsSqflApi>().setLoggedOut();
+      return 0;
+    }
     var ret = await api.addLogEntry(LogFields(controller.text));
     controller.clear();
     return ret;
