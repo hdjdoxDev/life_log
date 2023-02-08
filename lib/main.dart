@@ -15,10 +15,14 @@ void main() {
 
 class LifeLogApp extends StatelessWidget {
   const LifeLogApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var routes = {
+      '/log': (context) => const LogView(),
+      '/trash': (context) => const LogTrashView(),
+      '/settings': (context) => const SettingsView(),
+    };
 
     return BaseView<SettingsModel>(
       onModelReady: (model) => model.loadModel(),
@@ -34,13 +38,17 @@ class LifeLogApp extends StatelessWidget {
           ),
         ),
         initialRoute: '/',
+        onUnknownRoute: (settings) => MaterialPageRoute(
+          builder: (context) => const LoginView(),
+        ),
         routes: {
           '/': (context) => const LogoView(),
-          '/log': (context) =>
-              model.logged ? const LogView() : const LoginView(),
-          '/log/trash': (context) => const LogTrashView(),
-          '/settings': (context) => const SettingsView(),
-          '/login': (context) => const LoginView(),
+          for (var view in routes.entries)
+            if (model.logged) ...{
+              view.key: view.value,
+              // } else ...{
+              // view.key: (context) => const LoginView(),
+            },
         },
       ),
     );

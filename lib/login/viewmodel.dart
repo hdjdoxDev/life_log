@@ -43,7 +43,7 @@ class LoginModel extends SettingsModel {
             lastModified: now.millisecondsSinceEpoch),
         LogEntry(
             msg:
-                "type the password to login${pass == 'guest' ? ", 'guest' for now" : ''}",
+                "type the password to login${pass == 'guest' ? ", 'guest' for now" : " $pass"}",
             id: 4,
             lastModified: now.millisecondsSinceEpoch),
         LogEntry(
@@ -74,12 +74,14 @@ class LoginModel extends SettingsModel {
   void getInput() async {
     // check login
     if (controller.text == pass) {
-      settingApi.setLoggedIn();
+      settingsApi.setLoggedIn();
     }
     // save log
     appendLog(controller.text);
     // parse
     var text = controller.text;
+    controller.clear();
+
     if (!text.contains(", ")) return;
     var name = text.split(", ").first;
     var msg = text.split(", ").last;
@@ -87,7 +89,7 @@ class LoginModel extends SettingsModel {
     if (name == ISettingsApi.passName && msg == pass) {
       appendLog("Welcome back $user!");
       Future.delayed(
-          const Duration(seconds: 2), () => settingApi.setLoggedIn());
+          const Duration(seconds: 2), () => settingsApi.setLoggedIn());
     }
     //color command
     else if (name == ISettingsApi.colorName) {
@@ -101,9 +103,8 @@ class LoginModel extends SettingsModel {
     // user command
     else if (name == ISettingsApi.userName) {
       appendLog("I find $msg to be perfect!");
-      settingApi.setSetting(ISettingsApi.userName, msg);
+      settingsApi.setSetting(ISettingsApi.userName, msg);
     }
-    controller.clear();
   }
 
   @override

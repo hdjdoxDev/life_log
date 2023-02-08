@@ -19,12 +19,29 @@ class SettingsView extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 50),
-                  Text("User: ${model.user}"),
+                  Row(
+                    children: [
+                      Text("User: ${model.user}"),
+                      LifeIconButton(
+                          onTap: model.logOut,
+                          color: Theme.of(context).colorScheme.secondary,
+                          iconData: CupertinoIcons.lock_fill)
+                    ],
+                  ),
                   const SizedBox(height: 50),
-                  Text("Pass: ${model.pass}"),
+                  Row(
+                    children: [
+                      Text("User: ${model.hideMode ? "******" : model.pass}"),
+                      LifeIconButton(
+                          onTap: model.toggleHideMode,
+                          color: Theme.of(context).colorScheme.secondary,
+                          iconData: CupertinoIcons.eye)
+                    ],
+                  ),
                   const SizedBox(height: 50),
                   DropdownButton<int>(
                     hint: const Text("Main color: "),

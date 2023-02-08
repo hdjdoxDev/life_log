@@ -16,11 +16,13 @@ class SettingsModel extends IScrollableModel {
       StreamController.broadcast();
   static const String settingsMsg = "settings";
 
+  bool hideMode = true;
+
   static Stream<Color> get mainColorStream => _mainColorStreamController.stream;
 
   // settings
   @protected
-  late final SettingsSqflApi settingApi;
+  late final SettingsSqflApi settingsApi;
   @protected
   late Stream<List<SettingsEntry>> settingsEntryStream;
   @protected
@@ -43,15 +45,15 @@ class SettingsModel extends IScrollableModel {
     setState(ViewState.busy);
 
     await locator.isReady<SettingsSqflApi>();
-    settingApi = locator<SettingsSqflApi>();
+    settingsApi = locator<SettingsSqflApi>();
 
-    settingsEntryStream = settingApi.getSettingsEntriesStream();
+    settingsEntryStream = settingsApi.getSettingsEntriesStream();
     settingsEntryStream.listen(listener);
     setState(ViewState.idle);
   }
 
-  void listener(List<SettingsEntry> settings) async {
-    settings = settings;
+  void listener(List<SettingsEntry> s) async {
+    settings = s;
     colorIndex =
         getColorIndexIfValid(ISettingsApi.colorName) ?? defaultColorIndex;
     totalEntries = getIntIfValid(ISettingsApi.totalName) ?? 0;
@@ -113,7 +115,7 @@ class SettingsModel extends IScrollableModel {
   Future setMainColor({MaterialColor? color}) async {
     _mainColorStreamController
         .add(colors[colors.indexOf(color ?? defaultColor)]);
-    return settingApi.setSetting(
+    return settingsApi.setSetting(
         ISettingsApi.colorName, "${colors.indexOf(color ?? defaultColor)}");
   }
 
@@ -138,7 +140,7 @@ class SettingsModel extends IScrollableModel {
       colors[i != null && i >= 0 && i < totColors ? i : colorIndex];
 
   String niceColor(int i) => nice(colors[i].value);
-  
+
   /// user input
   getInput() {
     var text = controller.text;
@@ -151,11 +153,11 @@ class SettingsModel extends IScrollableModel {
     }
     // user command
     else if (name == ISettingsApi.userName) {
-      settingApi.setSetting(ISettingsApi.userName, msg);
+      settingsApi.setSetting(ISettingsApi.userName, msg);
     }
     // pass command
     else if (name == ISettingsApi.passName) {
-      settingApi.setSetting(ISettingsApi.passName, msg);
+      settingsApi.setSetting(ISettingsApi.passName, msg);
     }
     // uneditables
     else if (name == ISettingsApi.totalName) {
@@ -164,13 +166,18 @@ class SettingsModel extends IScrollableModel {
     }
     // other
     else {
-      settingApi.setSetting(name, msg);
+      settingsApi.setSetting(name, msg);
     }
     controller.clear();
   }
 
   /// logout
   void logOut() {
-    settingApi.setLoggedOut();
+    settingsApi.setLoggedOut();
+  }
+
+  void toggleHideMode() {
+    hideMode = !hideMode;
+    notifyListeners();
   }
 }
