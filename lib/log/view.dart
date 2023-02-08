@@ -85,7 +85,7 @@ class LogView extends StatelessWidget {
               LifeIconButton(
                 onTap: () {
                   if (LoginModel.logOutMsgs.contains(model.controller.text)) {
-                    locator.get<LoginModel>().logOut();
+                    locator.get<SettingsModel>().logOut();
                   } else if (model.controller.text ==
                       SettingsModel.settingsMsg) {
                     Navigator.pushNamed(context, '/settings');

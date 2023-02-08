@@ -19,6 +19,7 @@ class LifeLogApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return BaseView<SettingsModel>(
       onModelReady: (model) => model.loadModel(),
       loading: MaterialApp(routes: {'/': (context) => const LogoView()}),
@@ -39,7 +40,7 @@ class LifeLogApp extends StatelessWidget {
               model.logged ? const LogView() : const LoginView(),
           '/log/trash': (context) => const LogTrashView(),
           '/settings': (context) => const SettingsView(),
-          // '/login': (context) => const LoginView(),
+          '/login': (context) => const LoginView(),
         },
       ),
     );

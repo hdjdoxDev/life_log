@@ -94,7 +94,6 @@ class SettingsSqflApi implements ISettingsApi {
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
 
-  @override
   Future<int> addSettingsEntry(SettingsFields lf) =>
       _addSettingsEntry(_db, lf).then((value) => notifySettingsEntries(value));
 

@@ -1,43 +1,41 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:life_log/model.dart';
 import 'package:mypack/core/enums/viewstate.dart';
-import 'package:mypack/core/viewmodels/base_viewmodel.dart';
 import 'package:mypack/locator.dart';
 import 'package:mypack/utils/time.dart';
 import '../login/viewmodel.dart';
 import 'model.dart';
 import 'sqfl.dart';
 
-class SettingsModel extends BaseModel {
+class SettingsModel extends IScrollableModel {
   static const MaterialColor defaultColor = Colors.yellow;
   static const int defaultColorIndex = 3;
   static final StreamController<Color> _mainColorStreamController =
       StreamController.broadcast();
-  static const String settingsMsg = "setting";
+  static const String settingsMsg = "settings";
 
   static Stream<Color> get mainColorStream => _mainColorStreamController.stream;
 
   // settings
   @protected
   late final SettingsSqflApi settingApi;
+  @protected
   late Stream<List<SettingsEntry>> settingsEntryStream;
-  late List<SettingsEntry> _settings;
-  late int _colorIndex;
-  late int _totalEntries;
-  late int _trashedEntries;
-  late String _user;
-  late String _pass;
-  late bool _logged;
+  @protected
+  late List<SettingsEntry> settings;
+
+  late int colorIndex;
+  late int totalEntries;
+  late int trashedEntries;
+  late String user;
+  late String pass;
+  late bool logged;
+
   final controller = TextEditingController();
 
   Color get mainColor => colors[colorIndex];
-  int get colorIndex => _colorIndex;
-  int get totalEntries => _totalEntries;
-  int get trashedEntries => _trashedEntries;
-  String get user => _user;
-  String get pass => _pass;
-  bool get logged => _logged;
 
   // load
   @override
@@ -53,28 +51,26 @@ class SettingsModel extends BaseModel {
   }
 
   void listener(List<SettingsEntry> settings) async {
-    _settings = settings;
-    _colorIndex =
+    settings = settings;
+    colorIndex =
         getColorIndexIfValid(ISettingsApi.colorName) ?? defaultColorIndex;
-    _totalEntries = getIntIfValid(ISettingsApi.totalName) ?? 0;
-    _trashedEntries = getIntIfValid(ISettingsApi.trashName) ?? 0;
-    _user = (_settings.where((e) => e.name == ISettingsApi.userName).isNotEmpty)
-        ? _settings.where((e) => e.name == ISettingsApi.userName).first.msg
+    totalEntries = getIntIfValid(ISettingsApi.totalName) ?? 0;
+    trashedEntries = getIntIfValid(ISettingsApi.trashName) ?? 0;
+    user = (settings.where((e) => e.name == ISettingsApi.userName).isNotEmpty)
+        ? settings.where((e) => e.name == ISettingsApi.userName).first.msg
         : LoginModel.defaultUser;
-    _pass = _settings.where((e) => e.name == ISettingsApi.passName).isNotEmpty
-        ? _settings.where((e) => e.name == ISettingsApi.passName).first.msg
+    pass = settings.where((e) => e.name == ISettingsApi.passName).isNotEmpty
+        ? settings.where((e) => e.name == ISettingsApi.passName).first.msg
         : LoginModel.defaultPass;
-    _logged = _settings
-            .where((e) => e.name == ISettingsApi.loggedName)
-            .isNotEmpty
-        ? _settings.where((e) => e.name == ISettingsApi.loggedName).first.msg !=
+    logged = settings.where((e) => e.name == ISettingsApi.loggedName).isNotEmpty
+        ? settings.where((e) => e.name == ISettingsApi.loggedName).first.msg !=
             "0"
         : false;
     notifyListeners();
   }
 
   int? getIntIfValid(String name, {List<SettingsEntry>? results}) {
-    var val = int.tryParse((results ?? _settings)
+    var val = int.tryParse((results ?? settings)
         .firstWhere((e) => e.name == ISettingsApi.colorName,
             orElse: () => SettingsEntry(
                 id: 0,
@@ -86,6 +82,7 @@ class SettingsModel extends BaseModel {
     return val;
   }
 
+  // colors
   static List<MaterialColor> get colors => [
         Colors.red,
         Colors.green,
@@ -101,7 +98,9 @@ class SettingsModel extends BaseModel {
         Colors.brown,
         Colors.grey
       ];
+
   int get totColors => colors.length;
+
   bool findSomeColors(List<SettingsEntry> results) =>
       results.where((e) => e.msg.startsWith(ISettingsApi.colorName)).isNotEmpty;
 
@@ -139,24 +138,39 @@ class SettingsModel extends BaseModel {
       colors[i != null && i >= 0 && i < totColors ? i : colorIndex];
 
   String niceColor(int i) => nice(colors[i].value);
-
+  
+  /// user input
   getInput() {
     var text = controller.text;
     if (!text.contains(", ")) return;
     var name = text.split(", ").first;
     var msg = text.split(", ").last;
+    // color command
     if (name == ISettingsApi.colorName) {
-      var color = getColor(int.tryParse(msg));
-      setMainColor(color: color);
-    } else if (name == ISettingsApi.userName) {
+      setMainColor(color: getColor(int.tryParse(msg)));
+    }
+    // user command
+    else if (name == ISettingsApi.userName) {
       settingApi.setSetting(ISettingsApi.userName, msg);
-    } else if (name == ISettingsApi.passName) {
+    }
+    // pass command
+    else if (name == ISettingsApi.passName) {
       settingApi.setSetting(ISettingsApi.passName, msg);
-    } else if (name == ISettingsApi.totalName) {
+    }
+    // uneditables
+    else if (name == ISettingsApi.totalName) {
     } else if (name == ISettingsApi.trashName) {
-    } else {
+    } else if (name == ISettingsApi.loggedName) {
+    }
+    // other
+    else {
       settingApi.setSetting(name, msg);
     }
     controller.clear();
+  }
+
+  /// logout
+  void logOut() {
+    settingApi.setLoggedOut();
   }
 }
