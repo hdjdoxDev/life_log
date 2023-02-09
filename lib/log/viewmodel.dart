@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:life_log/login/viewmodel.dart';
-import 'package:life_log/model.dart';
 import 'package:life_log/settings/sqfl.dart';
 import 'package:mypack/core/enums/viewstate.dart';
+import 'package:mypack/core/viewmodels/base_viewmodel.dart';
 import 'package:mypack/locator.dart';
 
 import 'sqfl.dart';

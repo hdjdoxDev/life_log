@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:life_log/model.dart';
 import 'package:mypack/core/enums/viewstate.dart';
+import 'package:mypack/core/viewmodels/base_viewmodel.dart';
 import 'package:mypack/locator.dart';
 import 'package:mypack/utils/time.dart';
 import '../login/viewmodel.dart';
