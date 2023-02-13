@@ -29,6 +29,7 @@ class LoginView extends StatelessWidget {
                             LoginTile(
                               entry: model.logs[i],
                               copyEntry: model.copyLog,
+                              deleteEntry: model.deleteLog,
                             ),
                             if (i < model.logs.length - 1)
                               Divider(

@@ -8,9 +8,11 @@ class LoginTile extends StatelessWidget {
   const LoginTile({
     required this.entry,
     required this.copyEntry,
+    required this.deleteEntry,
     super.key,
   });
   final void Function(String) copyEntry;
+  final void Function(int) deleteEntry;
   final LogEntry entry;
 
   @override
@@ -21,6 +23,11 @@ class LoginTile extends StatelessWidget {
         title: Text(entry.msg, style: const TextStyle(fontSize: 16)),
         subtitle: Text(dateTimeString(entry.time),
             style: const TextStyle(fontSize: 10)),
+        trailing: LifeIconButton(
+          color: Theme.of(context).colorScheme.secondary,
+          iconData: CupertinoIcons.delete,
+          onTap: () => deleteEntry(entry.id),
+        ),
       ),
     );
   }
@@ -48,7 +55,7 @@ class LogTile extends StatelessWidget {
         trailing: LifeIconButton(
           color: Theme.of(context).colorScheme.secondary,
           iconData: CupertinoIcons.delete,
-          onLongPress: () => Navigator.pushNamed(context, '/log/trash'),
+          onLongPress: () => Navigator.pushNamed(context, '/trash'),
           onTap: () => trashEntry(entry.id),
         ),
       ),

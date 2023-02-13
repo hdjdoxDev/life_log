@@ -61,6 +61,8 @@ class LoginModel extends SettingsModel {
     ..selection = TextSelection.fromPosition(
         TextPosition(offset: controller.text.length));
 
+  void deleteLog(int id) => _tempLogs.removeWhere((e) => e.id == id);
+
   void appendLog(String msg) {
     _tempLogs.add(LogEntry(
         msg: msg,
@@ -78,6 +80,7 @@ class LoginModel extends SettingsModel {
     }
     // save log
     appendLog(controller.text);
+    
     // parse
     var text = controller.text;
     controller.clear();

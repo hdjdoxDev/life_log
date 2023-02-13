@@ -44,11 +44,11 @@ class LifeLogApp extends StatelessWidget {
         routes: {
           '/': (context) => const LogoView(),
           for (var view in routes.entries)
-            if (model.logged) ...{
+            // if (model.logged) ...{
               view.key: view.value,
               // } else ...{
               // view.key: (context) => const LoginView(),
-            },
+            // },
         },
       ),
     );

@@ -64,10 +64,15 @@ class SettingsModel extends IScrollableModel {
     pass = settings.where((e) => e.name == ISettingsApi.passName).isNotEmpty
         ? settings.where((e) => e.name == ISettingsApi.passName).first.msg
         : LoginModel.defaultPass;
-    logged = settings.where((e) => e.name == ISettingsApi.loggedName).isNotEmpty
-        ? settings.where((e) => e.name == ISettingsApi.loggedName).first.msg !=
-            "0"
-        : false;
+    logged =
+        settings.where((e) => e.name == ISettingsApi.loggedName).isNotEmpty &&
+                settings
+                        .where((e) => e.name == ISettingsApi.loggedName)
+                        .first
+                        .msg ==
+                    "1"
+            ? true
+            : false;
     notifyListeners();
   }
 
