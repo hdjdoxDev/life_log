@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:life_log/login/viewmodel.dart';
-import 'package:life_log/settings/sqfl.dart';
-import 'package:mypack/core/enums/viewstate.dart';
-import 'package:mypack/core/viewmodels/base_viewmodel.dart';
-import 'package:mypack/locator.dart';
+import '../login/viewmodel.dart';
+import '../settings/sqfl.dart';
+import 'package:frontend/frontend.dart';
 
 import 'sqfl.dart';
 import 'model.dart';
 
-class LogModel extends IScrollableModel {
+class LogModel extends IScrollableModel<NoModelArgs> {
   static const List<String> backMsgs = [
     "back",
     "main",
@@ -36,7 +34,7 @@ class LogModel extends IScrollableModel {
 
   // load
   @override
-  Future loadModel() async {
+  Future init({dynamic args}) async {
     setState(ViewState.busy);
 
     await locator.isReady<LogSqflApi>();

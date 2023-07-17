@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mypack/utils/time.dart';
+import 'package:utils/time.dart';
 
 import 'model.dart';
 

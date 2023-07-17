@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:life_log/log/viewmodel.dart';
-import 'package:mypack/ui/views/base_view.dart';
+import 'package:frontend/frontend.dart';
 
 import '../log/widgets.dart';
 import 'viewmodel.dart';
@@ -12,9 +12,9 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomView<SettingsModel>(
-      onModelReady: (model) => model.loadModel(),
+      initModel: (model) => model.init(),
       title: "LifeLog - Settings",
-      builder: (context, model, _) => Column(
+      body: (context, model, _) => Column(
         children: [
           Expanded(
             child: SingleChildScrollView(

@@ -1,15 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mypack/core/enums/viewstate.dart';
-import 'package:mypack/core/viewmodels/base_viewmodel.dart';
-import 'package:mypack/locator.dart';
-import 'package:mypack/utils/time.dart';
+import 'package:frontend/frontend.dart';
+import 'package:utils/time.dart';
 import '../login/viewmodel.dart';
 import 'model.dart';
 import 'sqfl.dart';
 
-class SettingsModel extends IScrollableModel {
+class SettingsModel extends IScrollableModel<NoModelArgs> {
   static const MaterialColor defaultColor = Colors.yellow;
   static const int defaultColorIndex = 3;
   static final StreamController<Color> _mainColorStreamController =
@@ -41,7 +39,7 @@ class SettingsModel extends IScrollableModel {
 
   // load
   @override
-  Future loadModel() async {
+  Future init({dynamic args}) async {
     setState(ViewState.busy);
 
     await locator.isReady<SettingsSqflApi>();

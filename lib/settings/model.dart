@@ -1,10 +1,9 @@
-import 'package:mypack/core/models/database.dart';
-import 'package:mypack/core/models/sqfl.dart';
+import 'package:core/database/database.dart';
 
 import 'sqfl.dart';
 // Enums and Classes relative to Settings
 
-class SettingsFields implements ISqflEntryFields {
+class SettingsFields{
   String msg = "";
   String name = "";
   SettingsFields(
@@ -12,11 +11,18 @@ class SettingsFields implements ISqflEntryFields {
     this.msg,
   );
 
-  @override
   Map<String, Object?> toTable() => {
         SettingsSqflTable.colName: name,
         SettingsSqflTable.colMsg: msg,
       };
+
+  SettingsFields update(fields) {
+    if (fields is SettingsFields) {
+      name = fields.name;
+      msg = fields.msg;
+    }
+    return this;
+  }
 }
 
 class SettingsEntry extends SettingsFields implements ISqflEntry {
@@ -61,6 +67,7 @@ class SettingsEntry extends SettingsFields implements ISqflEntry {
 
   DateTime? get time => DateTime.fromMillisecondsSinceEpoch(_lastModified);
 
+  @override
   SettingsEntry update(dynamic fields) {
     if (fields is SettingsFields) {
       name = fields.name;

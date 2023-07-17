@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mypack/ui/views/base_view.dart';
+import 'package:frontend/frontend.dart';
 
 import 'locator.dart';
 import 'log/trash_view.dart';
@@ -24,8 +24,8 @@ class LifeLogApp extends StatelessWidget {
       '/settings': (context) => const SettingsView(),
     };
 
-    return BaseView<SettingsModel>(
-      onModelReady: (model) => model.loadModel(),
+    return IView<SettingsModel>(
+      initModel: (model) => model.init(),
       loading: MaterialApp(routes: {'/': (context) => const LogoView()}),
       builder: (context, model, _) => MaterialApp(
         debugShowCheckedModeBanner: false,

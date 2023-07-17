@@ -1,13 +1,12 @@
 import 'dart:async';
 
-import 'package:life_log/settings/viewmodel.dart';
-import 'package:mypack/core/models/database.dart';
-import 'package:mypack/core/models/database_column.dart';
-import 'package:mypack/utils/time.dart';
+import 'package:core/database/database.dart';
+import 'package:utils/time.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 
 import '../login/viewmodel.dart';
+import 'viewmodel.dart';
 import 'model.dart';
 
 class SettingsSqflTable extends IDatabaseTable {
@@ -121,12 +120,12 @@ class SettingsSqflApi implements ISettingsApi {
 
   Future<int> setLoggedOut() => setSetting(ISettingsApi.loggedName, "0");
 
-  Future<int> setTotal(int total) => setSetting(ISettingsApi.totalName, "$total");
+  Future<int> setTotal(int total) =>
+      setSetting(ISettingsApi.totalName, "$total");
 
-  Future<int> setTrash(int trash) => setSetting(ISettingsApi.trashName, "$trash");
+  Future<int> setTrash(int trash) =>
+      setSetting(ISettingsApi.trashName, "$trash");
 
   Future<int> setUserName(String name) =>
       setSetting(ISettingsApi.userName, name);
-
-      
 }

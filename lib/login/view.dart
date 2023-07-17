@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mypack/ui/views/base_view.dart';
+import 'package:frontend/frontend.dart';
 
 import '../log/widgets.dart';
 import 'viewmodel.dart';
@@ -11,9 +11,9 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomView<LoginModel>(
-      onModelReady: (model) => model.loadModel(),
+      initModel: (model) => model.init(),
       title: "LifeLog - Login",
-      builder: (context, model, _) => Column(
+      body: (context, model, _) => Column(
         children: [
           Expanded(
             flex: 6,

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:mypack/ui/views/base_view.dart';
+import 'package:frontend/frontend.dart';
 
 import 'trash_viewmodel.dart';
 import 'widgets.dart';
@@ -13,9 +13,9 @@ class LogTrashView extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomView<LogTrashModel>(
       title: "LifeLog - Trash",
-      onModelReady: (model) => model.loadModel(),
+      initModel: (model) => model.init(),
       onDoubleTapBar: (model) => model.scrollUp(),
-      builder: (context, model, _) => Column(
+      body: (context, model, _) => Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           Expanded(

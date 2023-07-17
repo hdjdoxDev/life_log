@@ -1,11 +1,10 @@
-import 'package:mypack/core/models/database.dart';
-import 'package:mypack/core/models/sqfl.dart';
+import 'package:core/database/database.dart';
 
 import 'sqfl.dart';
 
 // Enums and Classes relative to log
 
-class LogFields implements ISqflEntryFields {
+class LogFields implements ISqflFields {
   String msg = "";
 
   LogFields(this.msg);
@@ -14,6 +13,14 @@ class LogFields implements ISqflEntryFields {
   Map<String, Object?> toTable() => {
         LogSqflTable.colMsg: msg,
       };
+
+  @override
+  IFields update(fields) {
+    if (fields is LogFields) {
+      msg = fields.msg;
+    }
+    return this;
+  }
 }
 
 class LogEntry extends LogFields implements ISqflEntry {
@@ -43,11 +50,19 @@ class LogEntry extends LogFields implements ISqflEntry {
         _lastModified = lastModified,
         super(msg);
 
+  LogEntry.fromFields(LogFields sf, id, exportId, lastModified)
+      : _id = id,
+        _exportId = exportId,
+        _lastModified = lastModified,
+        super(sf.msg);
+
   LogEntry.fromTable(Map<String, dynamic> map)
       : _id = map[IDatabaseTable.colId],
         _lastModified = map[IDatabaseTable.colLastModified],
         _exportId = map[IDatabaseTable.colExportId],
         super(map[LogSqflTable.colMsg]);
+
+  DateTime? get time => DateTime.fromMillisecondsSinceEpoch(_lastModified);
 
   @override
   Map<String, Object?> toTable() => {
@@ -57,17 +72,9 @@ class LogEntry extends LogFields implements ISqflEntry {
         ...super.toTable(),
       };
 
-  DateTime? get time => DateTime.fromMillisecondsSinceEpoch(_lastModified);
-
+  @override
   LogEntry update(dynamic fields) {
-    if (fields is LogFields) {
-      msg = fields.msg;
-    } else if (fields is Map<String, dynamic> &&
-        fields.containsKey(LogSqflTable.colMsg)) {
-      msg = fields[LogSqflTable.colMsg];
-    } else if (fields is String) {
-      msg = fields;
-    }
+    super.update(fields);
     return this;
   }
 }

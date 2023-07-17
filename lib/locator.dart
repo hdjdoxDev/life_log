@@ -1,4 +1,4 @@
-import 'package:mypack/locator.dart';
+import 'package:frontend/locator.dart';
 
 import 'log/sqfl.dart';
 import 'log/trash_viewmodel.dart';

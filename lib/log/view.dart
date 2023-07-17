@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:mypack/locator.dart';
-import 'package:mypack/ui/views/base_view.dart';
+import 'package:frontend/frontend.dart';
 
 import '../login/viewmodel.dart';
 import '../settings/viewmodel.dart';
@@ -21,10 +20,10 @@ class LogView extends StatelessWidget {
           color: Theme.of(context).colorScheme.background,
         ),
       ],
-      onModelReady: (model) => model.loadModel(),
+      initModel: (model) => model.init(),
       onDoubleTapBar: (model) => model.scrollUp(),
       title: "LifeLog",
-      builder: (context, model, _) => Column(
+      body: (context, model, _) => Column(
         children: [
           Expanded(
             child: Padding(

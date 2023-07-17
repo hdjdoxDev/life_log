@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:life_log/settings/viewmodel.dart';
-import 'package:mypack/utils/time.dart';
+import 'package:utils/time.dart';
 
 import '../log/model.dart';
 import '../settings/model.dart';
@@ -80,7 +80,7 @@ class LoginModel extends SettingsModel {
     }
     // save log
     appendLog(controller.text);
-    
+
     // parse
     var text = controller.text;
     controller.clear();
