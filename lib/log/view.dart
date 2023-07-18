@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
+import 'package:life_log/main.dart';
 
-import '../login/viewmodel.dart';
 import '../settings/viewmodel.dart';
 import 'viewmodel.dart';
 import 'widgets.dart';
@@ -16,8 +16,8 @@ class LogView extends StatelessWidget {
       actions: [
         LifeIconButton(
           iconData: CupertinoIcons.settings,
-          onTap: () => Navigator.pushNamed(context, '/settings'),
-          color: Theme.of(context).colorScheme.background,
+          onTap: () => Navigator.pushNamed(context, LifeLogRoutes.settings),
+          color: Theme.of(context).colorScheme.primary,
         ),
       ],
       initModel: (model) => model.init(),
@@ -39,10 +39,14 @@ class LogView extends StatelessWidget {
                               entry: model.results[i],
                               trashEntry: model.trashLog,
                               copyEntry: model.copyLog,
+                              color: model.category.color,
+                              editCategory: model.editCategory,
+                              selected:
+                                  model.categoryIndex == model.results[i].id,
                             ),
                             if (i < model.results.length - 1)
                               Divider(
-                                color: Theme.of(context).colorScheme.secondary,
+                                color: model.category.color,
                                 indent: 16,
                                 endIndent: 20,
                                 thickness: 1,
@@ -54,21 +58,15 @@ class LogView extends StatelessWidget {
                   ),
                 )),
           ),
-          InkWell(
-            onDoubleTap: () => model.goToBottom(),
-            child: Column(
-              children: [
-                Divider(
-                  color: Theme.of(context).colorScheme.secondary,
-                  thickness: 7,
+          model.categoryPicking
+              ? CategoryPicker(
+                  onSelection: (category) => model.setCategory(category),
+                )
+              : MyDivider(
+                  onDoubleTap: model.goToBottom,
+                  onSwipe: model.editCategoryFilter,
+                  color: model.category.color,
                 ),
-                Divider(
-                  color: Theme.of(context).colorScheme.secondary,
-                  thickness: 7,
-                ),
-              ],
-            ),
-          ),
           Row(
             children: [
               Expanded(
@@ -83,27 +81,27 @@ class LogView extends StatelessWidget {
               )),
               LifeIconButton(
                 onTap: () {
-                  if (LoginModel.logOutMsgs.contains(model.controller.text)) {
-                    locator.get<SettingsModel>().logOut();
-                  } else if (model.controller.text ==
-                      SettingsModel.settingsMsg) {
-                    Navigator.pushNamed(context, '/settings');
+                  if (model.controller.text == SettingsModel.settingsMsg) {
+                    Navigator.pushNamed(context, LifeLogRoutes.settings);
                   } else {
                     model.saveLog();
                   }
                 },
                 iconData: CupertinoIcons.check_mark,
-                color: Theme.of(context).colorScheme.secondary,
+                color: model.category.color,
               ),
               LifeIconButton(
                 color: model.searching
-                    ? Theme.of(context).colorScheme.secondary
+                    ? model.category.color
                     : Theme.of(context).colorScheme.background,
                 iconData: CupertinoIcons.search,
                 onTap: () => model.toggleSearch(),
               ),
             ],
           ),
+          const SizedBox(
+            height: 20,
+          )
         ],
       ),
     );

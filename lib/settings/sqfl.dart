@@ -5,7 +5,6 @@ import 'package:utils/time.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
 
-import '../login/viewmodel.dart';
 import 'viewmodel.dart';
 import 'model.dart';
 
@@ -26,8 +25,6 @@ class SettingsSqflTable extends IDatabaseTable {
   List<SettingsFields> get initialSettings => [
         SettingsFields(
             ISettingsApi.colorName, "${SettingsModel.defaultColorIndex}"),
-        SettingsFields(ISettingsApi.userName, LoginModel.defaultUser),
-        SettingsFields(ISettingsApi.passName, LoginModel.defaultPass),
         SettingsFields(ISettingsApi.totalName, "0"),
         SettingsFields(ISettingsApi.trashName, "0"),
         SettingsFields(ISettingsApi.loggedName, "0")

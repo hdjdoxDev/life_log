@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/frontend.dart';
 
 import 'locator.dart';
 import 'log/trash_view.dart';
 import 'log/view.dart';
-import 'login/view.dart';
+import 'logo_view.dart';
 import 'settings/view.dart';
 import 'settings/viewmodel.dart';
 
@@ -15,76 +14,50 @@ void main() {
 
 class LifeLogApp extends StatelessWidget {
   const LifeLogApp({super.key});
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
-    var routes = {
-      '/log': (context) => const LogView(),
-      '/trash': (context) => const LogTrashView(),
-      '/settings': (context) => const SettingsView(),
-    };
-
-    return IView<SettingsModel>(
-      initModel: (model) => model.init(),
-      loading: MaterialApp(routes: {'/': (context) => const LogoView()}),
-      builder: (context, model, _) => MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'LifeLog',
-        theme: ThemeData(
-          fontFamily: "RobotoMono",
-          colorScheme: ColorScheme.dark(
-            primary: Colors.white,
-            secondary: model.getColor(null) ?? SettingsModel.defaultColor,
-          ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'LifeLog',
+      theme: ThemeData(
+        fontFamily: "RobotoMono",
+        colorScheme: const ColorScheme.dark(
+          primary: Colors.white,
+          secondary: SettingsModel.defaultColor,
         ),
-        initialRoute: '/',
-        onUnknownRoute: (settings) => MaterialPageRoute(
-          builder: (context) => const LoginView(),
-        ),
-        routes: {
-          '/': (context) => const LogoView(),
-          for (var view in routes.entries)
-            // if (model.logged) ...{
-              view.key: view.value,
-              // } else ...{
-              // view.key: (context) => const LoginView(),
-            // },
-        },
       ),
+      onUnknownRoute: (settings) => MaterialPageRoute(
+        builder: (context) => const LogoView(),
+      ),
+      initialRoute: LifeLogRoutes.initialRoute,
+      routes: LifeLogRoutes.routes,
     );
   }
 }
 
-class LogoView extends StatefulWidget {
-  const LogoView({super.key});
+class LifeLogRoutes {
+  static const String home = '/';
+  static const String initialRoute = home;
 
-  @override
-  State<LogoView> createState() => _LogoViewState();
-}
+  // other views - sn. localRoute
+  static const String log = '${home}log'; // sn. localRoute
+  static const String settings = '${home}settings'; // sn. localRoute
+  static const String trash = '${home}trash'; // sn. localRoute
 
-class _LogoViewState extends State<LogoView> {
-  @override
-  void initState() {
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pushReplacementNamed(context, '/log');
-    });
-    super.initState();
-  }
+  // subsections - sn. subRouteHome
 
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: Text(
-          "LifeLog",
-          style: TextStyle(
-            fontSize: 60,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
+  static Map<String, Widget Function(BuildContext)> get routes => {
+        home: (context) => const LogoView(),
+        log: (context) => const LogView(),
+        settings: (context) => const SettingsView(),
+        trash: (context) => const LogTrashView(),
+        // local routes - sn. newRoute
+
+        // subroutes - ...SubRoutes.routes,
+      };
+
+  static get pathsFromHome => [
+        // subRoutes home
+      ];
 }

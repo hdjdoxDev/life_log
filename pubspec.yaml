@@ -28,17 +28,20 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  core:
+    path: ../../packages/core
   cupertino_icons: ^1.0.2
   flutter:
     sdk: flutter
   flutter_launcher_icons: ^0.11.0
-  get_it: ^7.2.0
   frontend:
     path: ../../packages/frontend
-  core:
-    path: ../../packages/core
+  get_it: ^7.2.0
   path: ^1.8.2
+  shared_preferences: ^2.2.0
   sqflite: ^2.2.4+1
+  utils:
+    path: ../../packages/utils
 
 flutter_icons:
   android: true
@@ -48,7 +51,7 @@ flutter_icons:
   macos:
     generate: true
     image_path: "icons/icon.png"
-  
+
 dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_test:

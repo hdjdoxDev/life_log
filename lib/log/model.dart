@@ -1,4 +1,5 @@
 import 'package:core/database/database.dart';
+import 'package:flutter/material.dart';
 
 import 'sqfl.dart';
 
@@ -6,13 +7,23 @@ import 'sqfl.dart';
 
 class LogFields implements ISqflFields {
   String msg = "";
+  LogCategory category = LogCategory.all;
 
-  LogFields(this.msg);
+  LogFields(this.msg, {this.category = LogCategory.all});
 
   @override
   Map<String, Object?> toTable() => {
         LogSqflTable.colMsg: msg,
+        LogSqflTable.colCategory: category.toString(),
       };
+
+  //from table
+  @override
+  LogFields.fromTable(Map<String, dynamic> map)
+      : msg = map[LogSqflTable.colMsg],
+        category = LogCategory.values.firstWhere(
+            (e) => e.toString() == map[LogSqflTable.colCategory],
+            orElse: () => LogCategory.all);
 
   @override
   IFields update(fields) {
@@ -44,23 +55,24 @@ class LogEntry extends LogFields implements ISqflEntry {
       {required String msg,
       required id,
       int? exportId,
-      required int lastModified})
+      required int lastModified,
+      LogCategory category = LogCategory.all})
       : _id = id,
         _exportId = exportId,
         _lastModified = lastModified,
-        super(msg);
+        super(msg, category: category);
 
   LogEntry.fromFields(LogFields sf, id, exportId, lastModified)
       : _id = id,
         _exportId = exportId,
         _lastModified = lastModified,
-        super(sf.msg);
+        super(sf.msg, category: sf.category);
 
   LogEntry.fromTable(Map<String, dynamic> map)
       : _id = map[IDatabaseTable.colId],
         _lastModified = map[IDatabaseTable.colLastModified],
         _exportId = map[IDatabaseTable.colExportId],
-        super(map[LogSqflTable.colMsg]);
+        super.fromTable(map);
 
   DateTime? get time => DateTime.fromMillisecondsSinceEpoch(_lastModified);
 
@@ -87,4 +99,33 @@ abstract class ILogApi {
   Future<int> addLogEntry(LogEntry entry);
 
   static const String delPrefix = "x, ";
+}
+
+enum LogCategory {
+  all,
+  yellow,
+  red,
+  green,
+  blue,
+  purple,
+  orange;
+
+  Color get color {
+    switch (this) {
+      case LogCategory.yellow:
+        return Colors.yellow;
+      case LogCategory.red:
+        return Colors.red;
+      case LogCategory.green:
+        return Colors.green;
+      case LogCategory.blue:
+        return Colors.blue;
+      case LogCategory.purple:
+        return Colors.purple;
+      case LogCategory.orange:
+        return Colors.orange;
+      default:
+        return Colors.grey;
+    }
+  }
 }

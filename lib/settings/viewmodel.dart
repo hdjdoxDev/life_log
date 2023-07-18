@@ -2,8 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
-import 'package:utils/time.dart';
-import '../login/viewmodel.dart';
 import 'model.dart';
 import 'sqfl.dart';
 
@@ -58,10 +56,10 @@ class SettingsModel extends IScrollableModel<NoModelArgs> {
     trashedEntries = getIntIfValid(ISettingsApi.trashName) ?? 0;
     user = (settings.where((e) => e.name == ISettingsApi.userName).isNotEmpty)
         ? settings.where((e) => e.name == ISettingsApi.userName).first.msg
-        : LoginModel.defaultUser;
+        : "";
     pass = settings.where((e) => e.name == ISettingsApi.passName).isNotEmpty
         ? settings.where((e) => e.name == ISettingsApi.passName).first.msg
-        : LoginModel.defaultPass;
+        : "";
     logged =
         settings.where((e) => e.name == ISettingsApi.loggedName).isNotEmpty &&
                 settings
@@ -79,7 +77,7 @@ class SettingsModel extends IScrollableModel<NoModelArgs> {
         .firstWhere((e) => e.name == ISettingsApi.colorName,
             orElse: () => SettingsEntry(
                 id: 0,
-                lastModified: now.millisecondsSinceEpoch,
+                lastModified: DateTime.now().millisecondsSinceEpoch,
                 exportId: null,
                 name: ISettingsApi.colorName,
                 msg: "$defaultColorIndex"))

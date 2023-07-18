@@ -12,11 +12,15 @@ class LogSqflTable extends IDatabaseTable {
   static String get tableName => 'logsql';
 
   static String get colMsg => IDatabaseTable.colEntryNotes;
+  static String get colCategory => "category";
 
   LogSqflTable._()
       : super(
           tableName,
-          [],
+          [
+            DatabaseColumnFields(
+                name: colCategory, type: DatabaseColumnType.str, unique: false),
+          ],
           addSuggested: true,
         );
 
@@ -25,7 +29,7 @@ class LogSqflTable extends IDatabaseTable {
         LogFields("Down there you can type more :3"),
         LogFields("That trash can on our right kills us :("),
         LogFields("Long press on it to see the cimitery"),
-        LogFields("activate search mode you need to find the gray")
+        LogFields("To activate search mode you need to find the gray lens"),
       ];
 }
 
@@ -43,8 +47,10 @@ class LogSqflApi implements ILogApi {
   static Future<LogSqflApi> init() =>
       getDatabasesPath().then((path) => openDatabase(
             p.join(path, _dbName),
-            version: 1,
+            version: 2,
             onCreate: _onCreate,
+            onUpgrade: (db, oldVersion, newVersion) => db.execute(
+                "ALTER TABLE ${table.name} ADD COLUMN ${LogSqflTable.colCategory} TEXT"),
           ).then((value) => LogSqflApi._(value)));
 
   static Future<void> _onCreate(Database db, int version) async {
@@ -122,4 +128,13 @@ class LogSqflApi implements ILogApi {
           where: 'id = ?',
           whereArgs: [id]))
       .then((value) => notifyLogEntries(value));
+
+  void editCategory(int i, c) => _db
+      .update(
+        table.name,
+        {LogSqflTable.colCategory: c.toString()},
+        where: 'id = ?',
+        whereArgs: [i],
+      )
+      .then(((value) => notifyLogEntries(value)));
 }

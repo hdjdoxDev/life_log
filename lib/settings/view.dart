@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:life_log/log/viewmodel.dart';
 import 'package:frontend/frontend.dart';
 
 import '../log/widgets.dart';
@@ -106,11 +105,7 @@ class SettingsView extends StatelessWidget {
               )),
               LifeIconButton(
                 onTap: () {
-                  if (LogModel.backMsgs.contains(model.controller.text)) {
-                    Navigator.pop(context);
-                  } else {
-                    model.getInput();
-                  }
+                  model.getInput();
                 },
                 iconData: CupertinoIcons.check_mark,
                 color: Theme.of(context).colorScheme.secondary,
