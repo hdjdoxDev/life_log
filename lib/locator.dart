@@ -1,17 +1,14 @@
 import 'package:frontend/locator.dart';
 
-import 'log/sqfl.dart';
-import 'log/trash_viewmodel.dart';
+import 'data/sqfl.dart';
+import 'trash/viewmodel.dart';
 import 'log/viewmodel.dart';
-import 'settings/sqfl.dart';
-import 'settings/viewmodel.dart';
+import 'share/viewmodel.dart';
 
 void setupLocator() {
-  locator.registerLazySingletonAsync<LogSqflApi>(() => LogSqflApi.init());
-  locator.registerLazySingletonAsync<SettingsSqflApi>(
-      () => SettingsSqflApi.init());
+  locator.registerLazySingletonAsync<ILogApi>(() => LogSqflApi.init());
 
   locator.registerFactory<LogModel>(() => LogModel());
   locator.registerFactory<LogTrashModel>(() => LogTrashModel());
-  locator.registerFactory<SettingsModel>(() => SettingsModel());
+  locator.registerFactory<ShareModel>(() => ShareModel());
 }

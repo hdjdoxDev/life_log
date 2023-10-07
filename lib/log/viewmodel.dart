@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
 
-import 'sqfl.dart';
-import 'model.dart';
+import '../data/model.dart';
+import '../data/sqfl.dart';
 
 class LogModel extends IScrollableModel<NoModelArgs> {
   @protected
-  late final LogSqflApi api;
+  late final ILogApi api;
   @protected
   late Stream<List<LogEntry>> logEntryStream;
 
@@ -16,10 +16,8 @@ class LogModel extends IScrollableModel<NoModelArgs> {
   bool get searching => _searching;
   LogCategory _category = LogCategory.all;
   LogCategory get category => _category;
-  bool _categoryPicking = false;
   int? _categoryIndex;
   int? get categoryIndex => _categoryIndex;
-  get categoryPicking => _categoryPicking;
 
   List<LogEntry> entries = [];
   String query = "";
@@ -34,8 +32,8 @@ class LogModel extends IScrollableModel<NoModelArgs> {
   Future init({dynamic args}) async {
     setState(ViewState.busy);
 
-    await locator.isReady<LogSqflApi>();
-    api = locator<LogSqflApi>();
+    await locator.isReady<ILogApi>();
+    api = locator<ILogApi>();
 
     logEntryStream = api.getLogEntriesStream();
     logEntryStream.listen(listener);
@@ -51,7 +49,8 @@ class LogModel extends IScrollableModel<NoModelArgs> {
   }
 
   Future<int> saveLog() async {
-    var ret = await api.addLogEntry(LogFields(controller.text));
+    var ret =
+        await api.addLogEntry(LogFields(controller.text, category: category));
     controller.clear();
     return ret;
   }
@@ -88,22 +87,11 @@ class LogModel extends IScrollableModel<NoModelArgs> {
       api.editCategory(categoryIndex!, c);
       _categoryIndex = null;
     }
-    _categoryPicking = false;
-    notifyListeners();
-  }
-
-  void editCategoryFilter() {
-    _categoryPicking = !_categoryPicking;
-    if (_categoryIndex == null) {
-      _categoryPicking = !_categoryPicking;
-    } else {
-      _categoryIndex = null;
-    }
+    goToBottom();
     notifyListeners();
   }
 
   void editCategory(int id) {
-    _categoryPicking = true;
     _categoryIndex = id;
     notifyListeners();
   }

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
 import 'package:life_log/main.dart';
 
-import '../settings/viewmodel.dart';
 import 'viewmodel.dart';
 import 'widgets.dart';
 
@@ -35,6 +34,13 @@ class LogView extends StatelessWidget {
                       for (var i = 0; i < model.results.length; i++)
                         Column(
                           children: [
+                            Divider(
+                              color: model.results[i].category.color,
+                              indent: 16,
+                              endIndent: 20,
+                              thickness: 1,
+                              height: 1,
+                            ),
                             LogTile(
                               entry: model.results[i],
                               trashEntry: model.trashLog,
@@ -44,29 +50,16 @@ class LogView extends StatelessWidget {
                               selected:
                                   model.categoryIndex == model.results[i].id,
                             ),
-                            if (i < model.results.length - 1)
-                              Divider(
-                                color: model.category.color,
-                                indent: 16,
-                                endIndent: 20,
-                                thickness: 1,
-                                height: 1,
-                              ),
                           ],
                         ),
                     ],
                   ),
                 )),
           ),
-          model.categoryPicking
-              ? CategoryPicker(
-                  onSelection: (category) => model.setCategory(category),
-                )
-              : MyDivider(
-                  onDoubleTap: model.goToBottom,
-                  onSwipe: model.editCategoryFilter,
-                  color: model.category.color,
-                ),
+          CategoryPicker(
+            onSelection: (category) => model.setCategory(category),
+            selected: model.category,
+          ),
           Row(
             children: [
               Expanded(
@@ -77,15 +70,12 @@ class LogView extends StatelessWidget {
                   minLines: 1,
                   controller: model.controller,
                   style: const TextStyle(color: Colors.white),
+                  onSubmitted: (text) => model.saveLog(),
                 ),
               )),
               LifeIconButton(
                 onTap: () {
-                  if (model.controller.text == SettingsModel.settingsMsg) {
-                    Navigator.pushNamed(context, LifeLogRoutes.settings);
-                  } else {
-                    model.saveLog();
-                  }
+                  model.saveLog();
                 },
                 iconData: CupertinoIcons.check_mark,
                 color: model.category.color,

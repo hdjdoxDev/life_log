@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
 
-import 'trash_viewmodel.dart';
+import 'viewmodel.dart';
 import 'widgets.dart';
 
 class LogTrashView extends StatelessWidget {

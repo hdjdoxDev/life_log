@@ -1,6 +1,7 @@
 import 'package:life_log/log/viewmodel.dart';
 
-import 'model.dart';
+import '../data/model.dart';
+import '../data/sqfl.dart';
 
 class LogTrashModel extends LogModel {
   @override

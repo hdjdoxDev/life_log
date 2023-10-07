@@ -6,31 +6,35 @@ import 'package:path/path.dart' as p;
 
 import 'model.dart';
 
-class LogSqflTable extends IDatabaseTable {
-  static LogSqflTable instance = LogSqflTable._();
-  factory LogSqflTable() => instance;
-  static String get tableName => 'logsql';
+abstract class ILogApi {
+  /// Get all log entries
+  Future<List<LogEntry>> getLogEntries();
 
-  static String get colMsg => IDatabaseTable.colEntryNotes;
-  static String get colCategory => "category";
+  /// Add a log entry
+  Future<int> addLogEntry(LogFields entry);
 
-  LogSqflTable._()
-      : super(
-          tableName,
-          [
-            DatabaseColumnFields(
-                name: colCategory, type: DatabaseColumnType.str, unique: false),
-          ],
-          addSuggested: true,
-        );
+  /// Get all log entries updated
+  Stream<List<LogEntry>> getLogEntriesStream();
 
-  List<LogFields> get initialMsgs => [
-        LogFields("Hi! We are log entries :)"),
-        LogFields("Down there you can type more :3"),
-        LogFields("That trash can on our right kills us :("),
-        LogFields("Long press on it to see the cimitery"),
-        LogFields("To activate search mode you need to find the gray lens"),
-      ];
+  static const String delPrefix = "x, ";
+
+  moveToTrash(int id);
+
+  void editCategory(int i, c);
+
+  deleteLogEntry(int id);
+
+  restoreFromTrash(int id);
+
+  addEntryFromServer(
+      {required int eid, required int lm, required LogFields lf});
+
+  updateEntryFromServer(
+      {required int eid, required int lm, required LogFields lf});
+
+  void addExportId(int id, int exportId);
+
+  Future removeIdExport();
 }
 
 class LogSqflApi implements ILogApi {
@@ -47,18 +51,19 @@ class LogSqflApi implements ILogApi {
   static Future<LogSqflApi> init() =>
       getDatabasesPath().then((path) => openDatabase(
             p.join(path, _dbName),
-            version: 2,
+            version: 4,
             onCreate: _onCreate,
-            onUpgrade: (db, oldVersion, newVersion) => db.execute(
-                "ALTER TABLE ${table.name} ADD COLUMN ${LogSqflTable.colCategory} TEXT"),
-          ).then((value) => LogSqflApi._(value)));
+            onUpgrade: (db, oldVersion, newVersion) => {},
+          ).then((value) {
+            print(path);
+            return value;
+          })
+          .then((value) => LogSqflApi._(value)));
 
   static Future<void> _onCreate(Database db, int version) async {
-    if (version == 1) {
-      db.execute(table.createSqflite);
-      for (var lf in table.initialMsgs) {
-        _addLogEntry(db, lf);
-      }
+    db.execute(table.createSqflite);
+    for (var lf in table.initialMsgs) {
+      _addLogEntry(db, lf);
     }
   }
 
@@ -71,13 +76,14 @@ class LogSqflApi implements ILogApi {
   @override
   Future<List<LogEntry>> getLogEntries() => _getLogEntries(_db);
 
+  @override
   Stream<List<LogEntry>> getLogEntriesStream() {
     getLogEntries().then((value) => _logEntriesStreamController.add(value));
     return _logEntriesStreamController.stream;
   }
 
   Future<LogEntry> getLogEntry(int id) => _db.query(table.name,
-      where: 'id = ?',
+      where: '${IDatabaseTable.colId} = ?',
       whereArgs: [id]).then((value) => LogEntry.fromTable(value.first));
 
   Future<T> notifyLogEntries<T>(T ret) async {
@@ -100,10 +106,12 @@ class LogSqflApi implements ILogApi {
   Future<int> addLogEntry(LogFields lf) =>
       _addLogEntry(_db, lf).then((value) => notifyLogEntries(value));
 
+  @override
   Future deleteLogEntry(int id) => _db.delete(table.name,
-      where: 'id = ?',
+      where: '${IDatabaseTable.colId} = ?',
       whereArgs: [id]).then((value) => notifyLogEntries(value));
 
+  @override
   Future<int> moveToTrash(int id) => getLogEntry(id)
       .then((value) => _db.update(
             table.name,
@@ -112,11 +120,12 @@ class LogSqflApi implements ILogApi {
                   .update(LogFields("${ILogApi.delPrefix}${value.msg}"))
                   .toTable(),
             },
-            where: 'id = ?',
+            where: '${IDatabaseTable.colId} = ?',
             whereArgs: [id],
           ))
       .then((value) => notifyLogEntries(value));
 
+  @override
   Future<int> restoreFromTrash(int id) => getLogEntry(id)
       .then((value) => _db.update(
           table.name,
@@ -125,16 +134,61 @@ class LogSqflApi implements ILogApi {
                 .update(value.msg.substring(ILogApi.delPrefix.length))
                 .toTable(),
           },
-          where: 'id = ?',
+          where: '${IDatabaseTable.colId} = ?',
           whereArgs: [id]))
       .then((value) => notifyLogEntries(value));
 
+  @override
   void editCategory(int i, c) => _db
       .update(
         table.name,
         {LogSqflTable.colCategory: c.toString()},
-        where: 'id = ?',
+        where: '${IDatabaseTable.colId} = ?',
         whereArgs: [i],
       )
       .then(((value) => notifyLogEntries(value)));
+
+  @override
+  addEntryFromServer(
+          {required int eid, required int lm, required LogFields lf}) =>
+      _db
+          .insert(
+            table.name,
+            {
+              ...lf.toTable(),
+              IDatabaseTable.colLastModified: lm,
+              IDatabaseTable.colExportId: eid,
+            },
+            conflictAlgorithm: ConflictAlgorithm.replace,
+          )
+          .then((value) => notifyLogEntries(value));
+
+  @override
+  void addExportId(int id, int exportId) => _db.update(
+        table.name,
+        {IDatabaseTable.colExportId: exportId},
+        where: '${IDatabaseTable.colId} = ?',
+        whereArgs: [id],
+      );
+
+  @override
+  updateEntryFromServer(
+          {required int eid, required int lm, required LogFields lf}) =>
+      _db
+          .update(
+            table.name,
+            {
+              ...lf.toTable(),
+              IDatabaseTable.colLastModified: lm,
+            },
+            where: '${IDatabaseTable.colExportId} = ?',
+            whereArgs: [eid],
+          )
+          .then((value) => notifyLogEntries(value));
+
+  @override
+  Future removeIdExport() => _db.update(
+        table.name,
+        {IDatabaseTable.colExportId: null},
+      );
 }

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'locator.dart';
-import 'log/trash_view.dart';
+import 'trash/view.dart';
 import 'log/view.dart';
 import 'logo_view.dart';
-import 'settings/view.dart';
-import 'settings/viewmodel.dart';
+import 'share/view.dart';
 
 void main() {
   setupLocator();
@@ -24,7 +23,6 @@ class LifeLogApp extends StatelessWidget {
         fontFamily: "RobotoMono",
         colorScheme: const ColorScheme.dark(
           primary: Colors.white,
-          secondary: SettingsModel.defaultColor,
         ),
       ),
       onUnknownRoute: (settings) => MaterialPageRoute(
@@ -50,7 +48,7 @@ class LifeLogRoutes {
   static Map<String, Widget Function(BuildContext)> get routes => {
         home: (context) => const LogoView(),
         log: (context) => const LogView(),
-        settings: (context) => const SettingsView(),
+        settings: (context) => const ShareView(),
         trash: (context) => const LogTrashView(),
         // local routes - sn. newRoute
 
