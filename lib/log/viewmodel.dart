@@ -49,6 +49,9 @@ class LogModel extends IScrollableModel<NoModelArgs> {
   }
 
   Future<int> saveLog() async {
+    if (controller.text.isEmpty) {
+      return 0;
+    }
     var ret =
         await api.addLogEntry(LogFields(controller.text, category: category));
     controller.clear();
@@ -93,6 +96,11 @@ class LogModel extends IScrollableModel<NoModelArgs> {
 
   void editCategory(int id) {
     _categoryIndex = id;
+    notifyListeners();
+  }
+
+  deduplicate() {
+    api.deduplicate();
     notifyListeners();
   }
 }

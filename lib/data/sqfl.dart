@@ -35,6 +35,8 @@ abstract class ILogApi {
   void addExportId(int id, int exportId);
 
   Future removeIdExport();
+
+  void deduplicate();
 }
 
 class LogSqflApi implements ILogApi {
@@ -57,8 +59,7 @@ class LogSqflApi implements ILogApi {
           ).then((value) {
             print(path);
             return value;
-          })
-          .then((value) => LogSqflApi._(value)));
+          }).then((value) => LogSqflApi._(value)));
 
   static Future<void> _onCreate(Database db, int version) async {
     db.execute(table.createSqflite);
@@ -191,4 +192,25 @@ class LogSqflApi implements ILogApi {
         table.name,
         {IDatabaseTable.colExportId: null},
       );
+
+  @override
+  void deduplicate() {
+    getLogEntries().then((value) {
+      var map = <String, List<LogEntry>>{};
+      for (var e in value) {
+        if (map.containsKey(e.msg)) {
+          map[e.msg]!.add(e);
+        } else {
+          map[e.msg] = [e];
+        }
+      }
+      for (var e in map.entries) {
+        if (e.value.length > 1) {
+          for (var i = 1; i < e.value.length; i++) {
+            moveToTrash(e.value[i].id);
+          }
+        }
+      }
+    });
+  }
 }

@@ -8,6 +8,7 @@ import 'share/view.dart';
 
 void main() {
   setupLocator();
+
   runApp(const LifeLogApp());
 }
 

@@ -21,6 +21,8 @@ class LogView extends StatelessWidget {
       ],
       initModel: (model) => model.init(),
       onDoubleTapBar: (model) => model.scrollUp(),
+      onLongPressBar: (model) =>
+          Navigator.pushReplacementNamed(context, LifeLogRoutes.home),
       title: "LifeLog",
       body: (context, model, _) => Column(
         children: [

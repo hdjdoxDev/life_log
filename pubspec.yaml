@@ -22,6 +22,7 @@ dependencies:
   sqflite: ^2.3.0
   utils:
     path: ../../packages/utils
+  video_player: ^2.7.2
 
 flutter_icons:
   android: true
@@ -41,6 +42,7 @@ flutter:
   uses-material-design: true
   assets:
     - icons/icon.png
+    - icons/LifeLog.MP4
   fonts:
     - family: RobotoMono
       fonts:
