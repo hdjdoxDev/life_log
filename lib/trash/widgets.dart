@@ -4,35 +4,6 @@ import 'package:utils/time.dart';
 
 import '../data/model.dart';
 
-class LoginTile extends StatelessWidget {
-  const LoginTile({
-    required this.entry,
-    required this.copyEntry,
-    required this.deleteEntry,
-    super.key,
-  });
-  final void Function(String) copyEntry;
-  final void Function(int) deleteEntry;
-  final LogEntry entry;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragEnd: (details) => copyEntry(entry.msg),
-      child: ListTile(
-        title: Text(entry.msg, style: const TextStyle(fontSize: 16)),
-        subtitle: Text(dateTimeString(entry.time),
-            style: const TextStyle(fontSize: 10)),
-        trailing: LifeIconButton(
-          color: Theme.of(context).colorScheme.secondary,
-          iconData: CupertinoIcons.delete,
-          onTap: () => deleteEntry(entry.id),
-        ),
-      ),
-    );
-  }
-}
-
 class LogTile extends StatelessWidget {
   final void Function(int) trashEntry;
   final void Function(String) copyEntry;
@@ -93,7 +64,7 @@ class LogTrashTile extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           LifeIconButton(
-            color: Theme.of(context).colorScheme.secondary,
+            color: Theme.of(context).colorScheme.primary,
             iconData: CupertinoIcons.arrow_clockwise,
             onLongPress: () {
               restoreEntry(entry.id);
@@ -102,14 +73,14 @@ class LogTrashTile extends StatelessWidget {
             onTap: () => restoreEntry(entry.id),
           ),
           LifeIconButton(
-            color: Theme.of(context).colorScheme.secondary,
+            color: Theme.of(context).colorScheme.primary,
             iconData: CupertinoIcons.delete,
             onTap: () => deleteEntry(entry.id),
             onLongPress: () => Navigator.pop(context),
           ),
         ],
       ),
-      iconColor: Theme.of(context).colorScheme.secondary,
+      iconColor: Theme.of(context).colorScheme.primary,
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -16,7 +17,7 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
   Socket? socket;
   late final ILogApi api;
   final TextEditingController ipController = TextEditingController()
-    ..text = "10.1.205.249";
+    ..text = "192.168.1.77";
   ComState comState = ComState.init;
   String connection = 'ready';
   static const int port = 4646;
@@ -24,6 +25,8 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
   bool connected = false;
 
   int totNewEntries = 0;
+
+  String residual = "";
 
   // load
   @override
@@ -34,22 +37,29 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
     setState(ViewState.idle);
   }
 
+  void sendMessage(String msg) {
+    socket!.write("$msg$msgSeparator");
+  }
+
   void startSink() async {
     comState = ComState.sync;
 
     socket = await Socket.connect(ipController.text, port);
+    socket!.encoding = utf8;
+
     socket!.listen(onData);
 
-    socket!.write("SYNC$msgSeparator");
-    socket!.write("HEAD${LogEntry.csvHeaderContent}$msgSeparator");
-    socket!.write(await getSyncInfo());
-    socket!.write("DONE");
+    sendMessage("SYNC");
+    sendMessage("HEAD${LogEntry.csvHeaderContent}");
+    sendMessage(await getSyncInfo());
+    sendMessage("DONE");
   }
 
   void onData(Uint8List data) async {
-    var dataString = String.fromCharCodes(data);
+    var dataString = utf8.decode(data);
     var lines = dataString.split(msgSeparator);
-
+    lines[0] = residual + lines[0];
+    residual = lines.removeLast();
     for (var line in lines) {
       handleMessage(line);
     }
@@ -61,12 +71,11 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
     }
     var comm = line.substring(0, 4);
     var args = line.substring(4);
-    print("C recv in $comState: <$comm + $args>");
 
     switch (comm) {
       case "ASKE":
         if (comState == ComState.sync) {
-          sendSink(args);
+          sendSync(args);
         }
         break;
       case "UPDT":
@@ -108,12 +117,12 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
           (e) => "${e.exportId}$commaSeparator${e.lastModified}",
         )
         .join(pipeSeparator);
-    var msg = "INFO$exportedString$msgSeparator";
+    var msg = "INFO$exportedString";
     return msg;
   }
 
   /// msg = list of id
-  Future sendSink(String msg) async {
+  Future sendSync(String msg) async {
     var entries = await api.getLogEntries();
     // if updated asked, send updated entries
     if (msg != "") {
@@ -129,8 +138,8 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
         var match = entries.where(((element) => element.exportId == i));
         if (match.isNotEmpty) {
           var e = match.first;
-          socket!.write(
-              "UPDT${e.exportId}$commaSeparator${e.lastModified}$commaSeparator${e.toCsvContent}$msgSeparator");
+          sendMessage(
+              "UPDT${e.exportId}$commaSeparator${e.lastModified}$commaSeparator${e.toCsvContent}");
         }
       }
     }
@@ -140,14 +149,14 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
     totNewEntries = missing.length;
     if (missing.isNotEmpty) {
       for (var e in missing) {
-        socket!.write(
-            "NEWE${e.id}$commaSeparator${e.lastModified}$commaSeparator${e.toCsvContent}$msgSeparator");
+        sendMessage(
+            "NEWE${e.id}$commaSeparator${e.lastModified}$commaSeparator${e.toCsvContent}");
       }
     } else {
-      socket!.write("DONE$msgSeparator");
+      sendMessage("DONE");
     }
 
-    socket!.write("DONE$msgSeparator");
+    sendMessage("DONE");
   }
 
   /// msg = id,exportId
@@ -159,7 +168,7 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
     var exportId = int.parse(list[1]);
     api.addExportId(id, exportId);
     if (--totNewEntries == 0) {
-      socket!.write("DONE$msgSeparator");
+      sendMessage("DONE");
     }
   }
 

@@ -32,7 +32,7 @@ class LogTrashView extends StatelessWidget {
                   deleteEntry: model.deleteLog,
                 ),
                 separatorBuilder: (context, index) => Divider(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.primary,
                   indent: 16,
                   endIndent: 20,
                   thickness: 1,
@@ -46,11 +46,11 @@ class LogTrashView extends StatelessWidget {
             child: Column(
               children: [
                 Divider(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.primary,
                   thickness: 7,
                 ),
                 Divider(
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: Theme.of(context).colorScheme.primary,
                   thickness: 7,
                 ),
               ],
@@ -71,12 +71,12 @@ class LogTrashView extends StatelessWidget {
               LifeIconButton(
                 onTap: () => model.saveLog(),
                 iconData: CupertinoIcons.check_mark,
-                color: Theme.of(context).colorScheme.secondary,
+                color: Theme.of(context).colorScheme.primary,
               ),
               LifeIconButton(
                 iconData: CupertinoIcons.search,
                 color: model.searching
-                    ? Theme.of(context).colorScheme.secondary
+                    ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).colorScheme.background,
                 onTap: () => model.toggleSearch(),
               ),

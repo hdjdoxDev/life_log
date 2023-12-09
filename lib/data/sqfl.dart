@@ -53,19 +53,20 @@ class LogSqflApi implements ILogApi {
   static Future<LogSqflApi> init() =>
       getDatabasesPath().then((path) => openDatabase(
             p.join(path, _dbName),
-            version: 4,
+            version: 5,
             onCreate: _onCreate,
-            onUpgrade: (db, oldVersion, newVersion) => {},
+            onUpgrade: (db, oldVersion, newVersion) {},
           ).then((value) {
-            print(path);
+            // write here if you want to make changes to the database
             return value;
           }).then((value) => LogSqflApi._(value)));
 
   static Future<void> _onCreate(Database db, int version) async {
     db.execute(table.createSqflite);
-    for (var lf in table.initialMsgs) {
-      _addLogEntry(db, lf);
-    }
+    // on first run we can add some instructions as first logs
+    // for (var lf in table.initialMsgs) {
+    //   _addLogEntry(db, lf);
+    // }
   }
 
   Future<int> flushAllData() => _db.delete(table.name);

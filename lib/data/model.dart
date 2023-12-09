@@ -27,9 +27,8 @@ class LogFields implements ISqflFields {
         category = LogCategory.values.firstWhere(
             (e) => e.toString() == map[LogSqflTable.colCategory],
             orElse: () => LogCategory.all),
-        dateCreated =
-            DateTime.tryParse(map[LogSqflTable.colDateCreated] ?? "") ??
-                DateTime.now();
+        dateCreated = DateTime.fromMillisecondsSinceEpoch(
+            map[LogSqflTable.colDateCreated] ?? 0);
 
   @override
   IFields update(fields) {
@@ -99,7 +98,6 @@ class LogEntry extends LogFields implements ISqflEntry {
       ].join(commaSeparator);
 }
 
-
 class LogSqflTable extends IDatabaseTable {
   static LogSqflTable instance = LogSqflTable._();
   factory LogSqflTable() => instance;
@@ -116,7 +114,7 @@ class LogSqflTable extends IDatabaseTable {
             DatabaseColumnFields(
                 name: colCategory, type: DatabaseColumnType.str, unique: false),
             DatabaseColumnFields(
-                name: colDateCreated, type: DatabaseColumnType.str),
+                name: colDateCreated, type: DatabaseColumnType.int),
           ],
           addSuggested: true,
         );
