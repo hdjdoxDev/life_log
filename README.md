@@ -9,7 +9,9 @@
 * [x] find some way to remove the keyboard on iPhone
 * [x] cerca anche nelle date se si scrive una data
 * [x] add clear button -> long press on the send button -> long press again to restore
+* [~] some way of unlock -> l shape on animation
+* [ ] logo same color of the category
+* [ ] test category change and trash/untrashed are propagated correctly
 * [ ] shared preferences for ip address
-* [ ] some way of unlock
 * [ ] feedback on sync
 * [ ] vorrei aggiungere l'undo che sarebbe proprio fico e mi risolve anche l'icona che cerca di tornare al logo

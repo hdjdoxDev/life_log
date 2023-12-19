@@ -14,6 +14,10 @@ class _LogoViewState extends State<LogoView> {
   late VideoPlayerController _controller;
   late Future<void> _initializeVideoPlayerFuture;
 
+  void pushMain() {
+    Navigator.pushReplacementNamed(context, LifeLogRoutes.log);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -21,9 +25,9 @@ class _LogoViewState extends State<LogoView> {
     _initializeVideoPlayerFuture = _controller.initialize();
     _controller.setLooping(true);
     _controller.play();
-    Future.delayed(const Duration(seconds: 4), () {
-      Navigator.pushReplacementNamed(context, LifeLogRoutes.log);
-    });
+    // Future.delayed(const Duration(seconds: 4), () {
+    //   Navigator.pushReplacementNamed(context, LifeLogRoutes.log);
+    // });
   }
 
   @override
@@ -39,10 +43,20 @@ class _LogoViewState extends State<LogoView> {
         future: _initializeVideoPlayerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return Center(
-              child: AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(_controller),
+            return GestureDetector(
+              onHorizontalDragEnd: onHorizontalDragEnd,
+              onVerticalDragEnd: onVerticalDragEnd,
+              child: Column(
+                children: [
+                  Center(
+                    child: AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      child: VideoPlayer(_controller),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text("$state")
+                ],
               ),
             );
           } else {
@@ -53,5 +67,34 @@ class _LogoViewState extends State<LogoView> {
         },
       ),
     );
+  }
+
+  int _state = 0;
+  int get state => _state;
+  set state(int a) {
+    setState(() {
+      _state = a;
+    });
+  }
+
+  void onHorizontalDragEnd(DragEndDetails details) {
+    if (state == 0 && details.velocity.pixelsPerSecond.dx < 0) {
+      state = 1;
+    } else if (state == 3 && details.velocity.pixelsPerSecond.dx > 0) {
+      state = 4;
+      pushMain();
+    } else {
+      state = 0;
+    }
+  }
+
+  void onVerticalDragEnd(DragEndDetails details) {
+    if (state == 1 && details.velocity.pixelsPerSecond.dy < 0) {
+      state = 2;
+    } else if (state == 2 && details.velocity.pixelsPerSecond.dy > 0) {
+      state = 3;
+    } else {
+      state = 0;
+    }
   }
 }
