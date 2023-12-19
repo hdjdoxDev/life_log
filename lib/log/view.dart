@@ -37,7 +37,7 @@ class LogView extends StatelessWidget {
                         Column(
                           children: [
                             Divider(
-                              color: model.results[i].category.color,
+                              color: model.categorySelection.color,
                               indent: 16,
                               endIndent: 20,
                               thickness: 1,
@@ -46,11 +46,10 @@ class LogView extends StatelessWidget {
                             LogTile(
                               entry: model.results[i],
                               trashEntry: model.trashLog,
-                              copyEntry: model.copyLog,
-                              color: model.category.color,
-                              editCategory: model.editCategory,
+                              copyEntry: model.handleLogSwipe,
+                              selectLog: model.handleLogLongPress,
                               selected:
-                                  model.categoryIndex == model.results[i].id,
+                                  model.logSelection == model.results[i].id,
                             ),
                           ],
                         ),
@@ -59,8 +58,8 @@ class LogView extends StatelessWidget {
                 )),
           ),
           CategoryPicker(
-            onSelection: (category) => model.setCategory(category),
-            selected: model.category,
+            onSelection: model.handleCategoryPick,
+            selected: model.categorySelection,
           ),
           Row(
             children: [
@@ -68,26 +67,25 @@ class LogView extends StatelessWidget {
                   child: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextField(
+                  focusNode: model.focusNode,
                   maxLines: 5,
                   minLines: 1,
                   controller: model.controller,
                   style: const TextStyle(color: Colors.white),
-                  onSubmitted: (text) => model.saveLog(),
                 ),
               )),
               LifeIconButton(
-                onTap: () {
-                  model.saveLog();
-                },
+                onTap: model.handleSave,
+                onLongPress: model.handleSaveLongPress,
                 iconData: CupertinoIcons.check_mark,
-                color: model.category.color,
+                color: model.categorySelection.color,
               ),
               LifeIconButton(
-                color: model.searching
-                    ? model.category.color
+                color: model.searchingMode
+                    ? model.categorySelection.color
                     : Theme.of(context).colorScheme.background,
                 iconData: CupertinoIcons.search,
-                onTap: () => model.toggleSearch(),
+                onTap: () => model.handleSearch(),
               ),
             ],
           ),

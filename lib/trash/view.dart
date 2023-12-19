@@ -69,16 +69,16 @@ class LogTrashView extends StatelessWidget {
                 ),
               )),
               LifeIconButton(
-                onTap: () => model.saveLog(),
+                onTap: () => model.handleSave(),
                 iconData: CupertinoIcons.check_mark,
                 color: Theme.of(context).colorScheme.primary,
               ),
               LifeIconButton(
                 iconData: CupertinoIcons.search,
-                color: model.searching
+                color: model.searchingMode
                     ? Theme.of(context).colorScheme.primary
                     : Theme.of(context).colorScheme.background,
-                onTap: () => model.toggleSearch(),
+                onTap: () => model.handleSearch(),
               ),
             ],
           ),

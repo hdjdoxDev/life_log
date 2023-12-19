@@ -1,5 +1,7 @@
 import 'package:core/database/database.dart';
 import 'package:flutter/material.dart';
+import 'package:utils/stringify.dart';
+import 'package:utils/time.dart';
 
 import '../share/viewmodel.dart';
 
@@ -69,7 +71,9 @@ class LogEntry extends LogFields implements ISqflEntry {
         exportId = map[IDatabaseTable.colExportId],
         super.fromTable(map);
 
-  DateTime? get time => DateTime.fromMillisecondsSinceEpoch(lastModified);
+  DateTime get time => dateCreated;
+
+  String get readableTime => "${dateTimeString(time)} - ${weekDaysShort(time.weekday)}";
 
   @override
   Map<String, Object?> toTable() => {

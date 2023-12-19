@@ -7,17 +7,15 @@ import '../data/model.dart';
 class LogTile extends StatelessWidget {
   final void Function(int) trashEntry;
   final void Function(String) copyEntry;
-  final void Function(int) editCategory;
+  final void Function(int) selectLog;
   final LogEntry entry;
-  final Color color;
   final bool selected;
 
   const LogTile({
     required this.entry,
     required this.copyEntry,
     required this.trashEntry,
-    this.color = Colors.white,
-    required this.editCategory,
+    required this.selectLog,
     this.selected = false,
     super.key,
   });
@@ -25,12 +23,12 @@ class LogTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onHorizontalDragEnd: (details) => copyEntry(entry.msg),
-      onLongPress: () => editCategory(entry.id),
+      onLongPress: () => selectLog(entry.id),
       child: ListTile(
         selectedColor: Colors.black,
         selected: selected,
         title: Text(entry.msg, style: const TextStyle(fontSize: 16)),
-        subtitle: Text(dateTimeString(entry.time),
+        subtitle: Text(entry.readableTime,
             style: TextStyle(fontSize: 10, color: entry.category.color)),
         trailing: LifeIconButton(
           color: entry.category.color,

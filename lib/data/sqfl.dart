@@ -120,7 +120,9 @@ class LogSqflApi implements ILogApi {
             {
               ...value
                   .update(LogFields("${ILogApi.delPrefix}${value.msg}"))
-                  .toTable(),
+                  .toTable()
+                ..[IDatabaseTable.colLastModified] =
+                    DateTime.now().millisecondsSinceEpoch,
             },
             where: '${IDatabaseTable.colId} = ?',
             whereArgs: [id],
@@ -134,7 +136,9 @@ class LogSqflApi implements ILogApi {
           {
             ...value
                 .update(value.msg.substring(ILogApi.delPrefix.length))
-                .toTable(),
+                .toTable()
+              ..[IDatabaseTable.colLastModified] =
+                  DateTime.now().millisecondsSinceEpoch,
           },
           where: '${IDatabaseTable.colId} = ?',
           whereArgs: [id]))
@@ -144,7 +148,10 @@ class LogSqflApi implements ILogApi {
   void editCategory(int i, c) => _db
       .update(
         table.name,
-        {LogSqflTable.colCategory: c.toString()},
+        {
+          LogSqflTable.colCategory: c.toString(),
+          IDatabaseTable.colLastModified: DateTime.now().millisecondsSinceEpoch,
+        },
         where: '${IDatabaseTable.colId} = ?',
         whereArgs: [i],
       )
