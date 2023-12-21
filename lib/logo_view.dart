@@ -47,6 +47,7 @@ class _LogoViewState extends State<LogoView> {
               onHorizontalDragEnd: onHorizontalDragEnd,
               onVerticalDragEnd: onVerticalDragEnd,
               child: Column(
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   Center(
                     child: AspectRatio(

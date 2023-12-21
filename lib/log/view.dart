@@ -24,6 +24,7 @@ class LogView extends StatelessWidget {
       onLongPressBar: (model) =>
           Navigator.pushReplacementNamed(context, LifeLogRoutes.home),
       title: "LifeLog",
+      titleColor: (model) => model.categorySelection.color,
       body: (context, model, _) => Column(
         children: [
           Expanded(
