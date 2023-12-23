@@ -1,6 +1,6 @@
 # life_log
 
-## done
+## to celebrate
 
 * [x] deduplica dati mac
 * [x] aggiungere animazione all'avvio
@@ -16,29 +16,24 @@
 * [x] day of month and day of week in app bar
 * [x] shared preferences for ip address
 * [x] feedback on sync
+* [x] edit category picker - make it nicer please
+* [x] edit messages
 
 ## to test
 
-* [ ] edit messages
 * [ ] some way of unlock -> l shape on animation
   * [x] swipes
   * [x] whole screen
-  * [ ] test whole screen
+  * [x] test whole screen
   * [ ] change sequence by some hint - like a color extraction that determines the right sequence
   * [ ] mac with different locking mechanism
-* [ ] test category change and trash/untrashed are propagated correctly
+
+## to do
+
+* [ ] review layout of settings
 
 ## to thihnk
 
 * [ ] highlight searched word in text and date
 * [ ] settings for text sizes - do I really want this? maybe I can just see what happens if I get it a bit smaller or bigger
 * [ ] vorrei aggiungere l'undo che sarebbe proprio fico
-
-## todo
-
-* [ ] edit category picker - make it nicer please
-* [ ] review layout of settings
-
-## to fix
-
-* [ ] save

@@ -134,16 +134,18 @@ class LogSqflApi implements ILogApi {
   @override
   Future<int> restoreFromTrash(int id) => getLogEntry(id)
       .then((value) => _db.update(
-          table.name,
-          {
-            ...value
-                .update(value.msg.substring(ILogApi.delPrefix.length))
-                .toTable()
-              ..[IDatabaseTable.colLastModified] =
-                  DateTime.now().millisecondsSinceEpoch,
-          },
-          where: '${IDatabaseTable.colId} = ?',
-          whereArgs: [id]))
+            table.name,
+            {
+              ...value
+                  .update(
+                      LogFields(value.msg.substring(ILogApi.delPrefix.length)))
+                  .toTable()
+                ..[IDatabaseTable.colLastModified] =
+                    DateTime.now().millisecondsSinceEpoch,
+            },
+            where: '${IDatabaseTable.colId} = ?',
+            whereArgs: [id],
+          ))
       .then((value) => notifyLogEntries(value));
 
   @override

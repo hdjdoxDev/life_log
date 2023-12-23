@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
-import 'package:life_log/main.dart';
 import 'package:utils/stringify.dart';
 import 'package:utils/time.dart';
 
+import '../main.dart';
 import '../widgets/category_picker.dart';
 import '../widgets/life_icon_button.dart';
 import '../widgets/log_tile.dart';
@@ -16,6 +16,10 @@ class LogView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomView<LogModel>(
+      title: "LifeLog - ${weekDaysShort(now.weekday)} ${now.day}",
+      titleColor: (model) => model.categorySelection.color,
+      initModel: (model) => model.init(),
+      onDoubleTapBar: (model) => model.scrollUp(),
       actions: [
         Padding(
           padding: const EdgeInsets.only(right: 16.0),
@@ -26,15 +30,13 @@ class LogView extends StatelessWidget {
           ),
         ),
       ],
-      initModel: (model) => model.init(),
-      onDoubleTapBar: (model) => model.scrollUp(),
-      onLongPressBar: (model) =>
-          Navigator.pushReplacementNamed(context, LifeLogRoutes.home),
-      title: "LifeLog - ${weekDaysShort(now.weekday)} ${now.day}",
-      titleColor: (model) => model.categorySelection.color,
       body: (context, model, _) => Column(
         children: [
-          Container(height: 8, color: model.categorySelection.color),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            height: 8,
+            color: model.categorySelection.color,
+          ),
           Expanded(
             child: SingleChildScrollView(
               controller: model.controllerScroll,
@@ -54,21 +56,9 @@ class LogView extends StatelessWidget {
                         color: model.categorySelection.color,
                         indent: 16,
                         endIndent: 16,
-                        thickness: 2,
+                        thickness: 1,
                         height: 1,
                       ),
-                    if (i < model.results.length - 1 &&
-                        model.results[i].time.day !=
-                            model.results[i + 1].time.day) ...[
-                      const SizedBox(height: 4),
-                      Divider(
-                        color: model.categorySelection.color,
-                        indent: 16,
-                        endIndent: 16,
-                        thickness: 2,
-                        height: 1,
-                      ),
-                    ]
                   ],
                 ],
               ),
@@ -83,12 +73,15 @@ class LogView extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    focusNode: model.focusNode,
-                    maxLines: 5,
-                    minLines: 1,
-                    controller: model.controller,
-                    style: const TextStyle(color: Colors.white),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: TextField(
+                      focusNode: model.focusNode,
+                      maxLines: 5,
+                      minLines: 1,
+                      controller: model.controller,
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -100,12 +93,13 @@ class LogView extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 LifeIconButton(
+                  iconData: CupertinoIcons.search,
                   color: model.searchingMode
                       ? model.categorySelection.color
                       : Theme.of(context).colorScheme.background,
-                  iconData: CupertinoIcons.search,
                   onTap: () => model.handleSearch(),
                 ),
+                const SizedBox(width: 8),
               ],
             ),
           ),

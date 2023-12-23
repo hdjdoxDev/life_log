@@ -3,46 +3,49 @@ import 'package:flutter/material.dart';
 import '../data/model.dart';
 
 class CategoryPicker extends StatelessWidget {
-  const CategoryPicker({required this.onSelection, super.key, this.selected});
+  const CategoryPicker({required this.onSelection, this.selected, super.key});
   final void Function(LogCategory) onSelection;
   final LogCategory? selected;
 
   @override
   Widget build(BuildContext context) {
     const double heightButtons = 24;
+    const double radius = 8;
     return Column(
       children: [
-        Container(color: selected?.color ?? Colors.transparent, height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          color: selected?.color ?? Colors.transparent,
+          height: radius,
+        ),
+        Stack(
           children: [
-            for (var category in LogCategory.orderedValues)
-              Expanded(
-                flex: category == selected ? 1 : 4,
-                child: InkWell(
-                  onTap: () {
-                    onSelection(category);
-                  },
-                  child: Stack(children: [
-                    Container(
-                        color: selected?.color ?? Colors.transparent,
-                        height: heightButtons),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: category.color,
-                        borderRadius: selected == category
-                            ? const BorderRadiusDirectional.all(
-                                Radius.circular(10))
-                            : const BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                              ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              color: selected?.color ?? Colors.transparent,
+              height: radius,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                for (var category in LogCategory.orderedValues)
+                  Expanded(
+                    flex: category == selected ? 1 : 1,
+                    child: InkWell(
+                      onTap: () {
+                        onSelection(category);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: category.color,
+                          borderRadius: BorderRadius.circular(radius),
+                        ),
+                        height: heightButtons,
                       ),
-                      height: heightButtons,
                     ),
-                  ]),
-                ),
-              ),
+                  ),
+              ],
+            ),
           ],
         ),
       ],

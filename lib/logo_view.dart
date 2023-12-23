@@ -25,9 +25,6 @@ class _LogoViewState extends State<LogoView> {
     _initializeVideoPlayerFuture = _controller.initialize();
     _controller.setLooping(true);
     _controller.play();
-    // Future.delayed(const Duration(seconds: 4), () {
-    //   Navigator.pushReplacementNamed(context, LifeLogRoutes.log);
-    // });
   }
 
   @override
@@ -49,14 +46,18 @@ class _LogoViewState extends State<LogoView> {
               child: Column(
                 mainAxisSize: MainAxisSize.max,
                 children: [
+                  Expanded(
+                    child: Container(color: Colors.black87),
+                  ),
                   Center(
                     child: AspectRatio(
                       aspectRatio: _controller.value.aspectRatio,
                       child: VideoPlayer(_controller),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text("$state")
+                  Expanded(
+                    child: Container(color: Colors.black87),
+                  ),
                 ],
               ),
             );

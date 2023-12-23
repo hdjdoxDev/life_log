@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'env.dart';
 import 'locator.dart';
 import 'trash/view.dart';
 import 'log/view.dart';
@@ -37,7 +38,7 @@ class LifeLogApp extends StatelessWidget {
 
 class LifeLogRoutes {
   static const String home = '/';
-  static const String initialRoute = home;
+  static String initialRoute = (env == Enviroment.DEV) ? log : home;
 
   // other views - sn. localRoute
   static const String log = '${home}log'; // sn. localRoute
