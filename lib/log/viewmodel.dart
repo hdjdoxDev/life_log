@@ -88,18 +88,30 @@ class LogModel extends IScrollableModel<NoModelArgs> {
     }
   }
 
-  // save new entry, unfocus when empty
-  Future<int> handleSave() async {
+  // save new entry, complete edit when log selected, unfocus when empty
+  void handleSave() async {
+    // hide keyboard if no text
     if (controller.text.isEmpty) {
       focusNode.unfocus();
-      return 0;
-    } else {
-      var ret = await api
-          .addLogEntry(LogFields(controller.text, category: categorySelection));
-      controller.text = query;
-      query = "";
-      return ret;
+      return;
     }
+
+    // complete log edit
+    if (_logSelection != null) {
+      api.editLogEntry(_logSelection!,
+          LogFields(controller.text, category: _categorySelection));
+      _logSelection = null;
+    }
+
+    // save new log
+    else {
+      await api.addLogEntry(
+          LogFields(controller.text, category: _categorySelection));
+    }
+
+    controller.text = query;
+    query = "";
+    return;
   }
 
   // switch for searching mode
@@ -133,19 +145,24 @@ class LogModel extends IScrollableModel<NoModelArgs> {
 
   // change category selection or udpate log category when selected
   void handleCategoryPick(LogCategory c) {
-    if (logSelection == null) {
-      _categorySelection = c;
-    } else {
-      api.editCategory(logSelection!, c);
-      _logSelection = null;
-    }
+    _categorySelection = c;
     goToBottom();
     notifyListeners();
   }
 
-  // select log entry to edit category
-  void handleLogLongPress(int id) {
-    _logSelection = id;
+  // select log entry to edit it
+  void handleLogLongPress(LogEntry log) {
+    if (_logSelection == log.id) {
+      _logSelection = null;
+      controller.clear();
+    } else {
+      _categorySelection = log.category;
+      _logSelection = log.id;
+      controller
+        ..text = log.msg
+        ..selection = TextSelection.fromPosition(
+            TextPosition(offset: controller.text.length));
+    }
     notifyListeners();
   }
 

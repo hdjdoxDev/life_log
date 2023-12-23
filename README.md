@@ -1,5 +1,7 @@
 # life_log
 
+## done
+
 * [x] deduplica dati mac
 * [x] aggiungere animazione all'avvio
 * [x] check per non inserire log vuoti
@@ -9,14 +11,34 @@
 * [x] find some way to remove the keyboard on iPhone
 * [x] cerca anche nelle date se si scrive una data
 * [x] add clear button -> long press on the send button -> long press again to restore
-* [~] some way of unlock -> l shape on animation
-* [ ] lock screen in settings
-* [ ] logo same color of the category
-* [ ] test category change and trash/untrashed are propagated correctly
-* [ ] shared preferences for ip address
-* [ ] feedback on sync
-* [ ] vorrei aggiungere l'undo che sarebbe proprio fico e mi risolve anche l'icona che cerca di tornare al logo
-* [ ] highlight searched word in text and date
-* [ ] day of month and day of week in app bar
+* [x] logo same color of the category
+* [x] lock screen in settings
+* [x] day of month and day of week in app bar
+* [x] shared preferences for ip address
+* [x] feedback on sync
+
+## to test
+
 * [ ] edit messages
-* [ ] settings for text sizes
+* [ ] some way of unlock -> l shape on animation
+  * [x] swipes
+  * [x] whole screen
+  * [ ] test whole screen
+  * [ ] change sequence by some hint - like a color extraction that determines the right sequence
+  * [ ] mac with different locking mechanism
+* [ ] test category change and trash/untrashed are propagated correctly
+
+## to thihnk
+
+* [ ] highlight searched word in text and date
+* [ ] settings for text sizes - do I really want this? maybe I can just see what happens if I get it a bit smaller or bigger
+* [ ] vorrei aggiungere l'undo che sarebbe proprio fico
+
+## todo
+
+* [ ] edit category picker - make it nicer please
+* [ ] review layout of settings
+
+## to fix
+
+* [ ] save

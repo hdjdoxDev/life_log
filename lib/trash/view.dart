@@ -3,10 +3,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
 
+import '../widgets/life_icon_button.dart';
+import '../widgets/log_trash_tile.dart';
 import 'viewmodel.dart';
-import 'widgets.dart';
 
 class LogTrashView extends StatelessWidget {
+  final Color viewColor = Colors.grey;
+
   const LogTrashView({Key? key}) : super(key: key);
 
   @override
@@ -29,7 +32,6 @@ class LogTrashView extends StatelessWidget {
                 itemBuilder: (context, index) => LogTrashTile(
                   entry: model.results[index],
                   restoreEntry: model.restoreLog,
-                  deleteEntry: model.deleteLog,
                 ),
                 separatorBuilder: (context, index) => Divider(
                   color: Theme.of(context).colorScheme.primary,
@@ -71,12 +73,12 @@ class LogTrashView extends StatelessWidget {
               LifeIconButton(
                 onTap: () => model.handleSave(),
                 iconData: CupertinoIcons.check_mark,
-                color: Theme.of(context).colorScheme.primary,
+                color: viewColor,
               ),
               LifeIconButton(
                 iconData: CupertinoIcons.search,
                 color: model.searchingMode
-                    ? Theme.of(context).colorScheme.primary
+                    ? viewColor
                     : Theme.of(context).colorScheme.background,
                 onTap: () => model.handleSearch(),
               ),

@@ -20,7 +20,9 @@ abstract class ILogApi {
 
   moveToTrash(int id);
 
-  void editCategory(int i, c);
+  // editCategory(int i, c);
+
+  editLogEntry(int id, LogFields lf);
 
   deleteLogEntry(int id);
 
@@ -145,15 +147,15 @@ class LogSqflApi implements ILogApi {
       .then((value) => notifyLogEntries(value));
 
   @override
-  void editCategory(int i, c) => _db
+  editLogEntry(int id, LogFields lf) => _db
       .update(
         table.name,
         {
-          LogSqflTable.colCategory: c.toString(),
+          ...lf.toTable(),
           IDatabaseTable.colLastModified: DateTime.now().millisecondsSinceEpoch,
         },
         where: '${IDatabaseTable.colId} = ?',
-        whereArgs: [i],
+        whereArgs: [id],
       )
       .then(((value) => notifyLogEntries(value)));
 

@@ -73,7 +73,8 @@ class LogEntry extends LogFields implements ISqflEntry {
 
   DateTime get time => dateCreated;
 
-  String get readableTime => "${dateTimeString(time)} - ${weekDaysShort(time.weekday)}";
+  String get readableTime =>
+      "${dateTimeString(time)} - ${weekDaysShort(time.weekday)}";
 
   @override
   Map<String, Object?> toTable() => {
@@ -141,6 +142,16 @@ enum LogCategory {
   purple,
   orange;
 
+  static List<LogCategory> get orderedValues => [
+        green,
+        blue,
+        purple,
+        all,
+        red,
+        yellow,
+        orange,
+      ];
+
   Color get color {
     switch (this) {
       case LogCategory.yellow:
@@ -156,7 +167,7 @@ enum LogCategory {
       case LogCategory.orange:
         return Colors.orange;
       default:
-        return Colors.grey;
+        return Colors.white;
     }
   }
 }
