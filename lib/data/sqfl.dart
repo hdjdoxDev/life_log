@@ -20,7 +20,9 @@ abstract class ILogApi {
 
   moveToTrash(int id);
 
-  void editCategory(int i, c);
+  // editCategory(int i, c);
+
+  editLogEntry(int id, LogFields lf);
 
   deleteLogEntry(int id);
 
@@ -132,28 +134,30 @@ class LogSqflApi implements ILogApi {
   @override
   Future<int> restoreFromTrash(int id) => getLogEntry(id)
       .then((value) => _db.update(
-          table.name,
-          {
-            ...value
-                .update(value.msg.substring(ILogApi.delPrefix.length))
-                .toTable()
-              ..[IDatabaseTable.colLastModified] =
-                  DateTime.now().millisecondsSinceEpoch,
-          },
-          where: '${IDatabaseTable.colId} = ?',
-          whereArgs: [id]))
+            table.name,
+            {
+              ...value
+                  .update(
+                      LogFields(value.msg.substring(ILogApi.delPrefix.length)))
+                  .toTable()
+                ..[IDatabaseTable.colLastModified] =
+                    DateTime.now().millisecondsSinceEpoch,
+            },
+            where: '${IDatabaseTable.colId} = ?',
+            whereArgs: [id],
+          ))
       .then((value) => notifyLogEntries(value));
 
   @override
-  void editCategory(int i, c) => _db
+  editLogEntry(int id, LogFields lf) => _db
       .update(
         table.name,
         {
-          LogSqflTable.colCategory: c.toString(),
+          ...lf.toTable(),
           IDatabaseTable.colLastModified: DateTime.now().millisecondsSinceEpoch,
         },
         where: '${IDatabaseTable.colId} = ?',
-        whereArgs: [i],
+        whereArgs: [id],
       )
       .then(((value) => notifyLogEntries(value)));
 

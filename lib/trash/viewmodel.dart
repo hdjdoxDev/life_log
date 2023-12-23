@@ -10,7 +10,5 @@ class LogTrashModel extends LogModel {
       .where((e) => e.msg.startsWith(ILogApi.delPrefix))
       .toList();
 
-  Future deleteLog(int id) => api.deleteLogEntry(id);
-
   Future restoreLog(int id) => api.restoreFromTrash(id);
 }

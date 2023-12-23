@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:frontend/frontend.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../data/model.dart';
 import '../data/sqfl.dart';
 
@@ -15,11 +16,16 @@ const pipeSeparator = "|";
 
 class ShareModel extends IScrollableModel<NoModelArgs> {
   Socket? socket;
+
   late final ILogApi api;
-  final TextEditingController ipController = TextEditingController()
-    ..text = "192.168.1.77";
+
+  final TextEditingController ipController = TextEditingController();
+
+  late SharedPreferences preferences;
   ComState comState = ComState.init;
+
   String connection = 'ready';
+
   static const int port = 4646;
 
   bool connected = false;
@@ -27,13 +33,33 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
   int totNewEntries = 0;
 
   String residual = "";
+  var ipAddressKey = "ip_address";
+
+  late BuildContext lastContext;
+
+  int get totalEntriesNow => totalEntriesLastSync + gotNewEntries;
+  int totalEntriesLastSync = 0;
+  int gotNewEntries = 0;
+  int sentNewEntries = 0;
+  int gotUpdatedEntries = 0;
+  int sentUpdatedEntries = 0;
+  int get leftUntouched =>
+      totalEntriesLastSync - gotUpdatedEntries - sentUpdatedEntries;
 
   // load
   @override
   void init({args = const NoModelArgs()}) async {
     setState(ViewState.busy);
+
     await locator.isReady<ILogApi>();
     api = locator<ILogApi>();
+
+    // shared preferences
+    preferences = await SharedPreferences.getInstance();
+    if (preferences.containsKey(ipAddressKey)) {
+      ipController.text = preferences.getString(ipAddressKey)!;
+    }
+
     setState(ViewState.idle);
   }
 
@@ -41,10 +67,26 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
     socket!.write("$msg$msgSeparator");
   }
 
-  void startSink() async {
+  void startSink(context) async {
+    lastContext = context;
+    // reset sync
+    totalEntriesLastSync = 0;
+    gotNewEntries = 0;
+    sentNewEntries = 0;
+    gotUpdatedEntries = 0;
+    sentUpdatedEntries = 0;
+
     comState = ComState.sync;
 
-    socket = await Socket.connect(ipController.text, port);
+    preferences.setString(ipAddressKey, ipController.text);
+
+    try {
+      socket = await Socket.connect(ipController.text, port);
+    } on SocketException catch (e) {
+      failedConnection(e);
+      return;
+    }
+
     socket!.encoding = utf8;
 
     socket!.listen(onData);
@@ -112,6 +154,10 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
   Future<String> getSyncInfo() async {
     var entries = await api.getLogEntries();
     var exported = entries.where((e) => e.exportId != null);
+
+    // save sync stats
+    totalEntriesLastSync = exported.length;
+
     var exportedString = exported
         .map(
           (e) => "${e.exportId}$commaSeparator${e.lastModified}",
@@ -133,6 +179,9 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
           )
           .toList();
 
+      // save sync stats
+      sentUpdatedEntries = toSend.length;
+
       // send UPDT + ExportId,lastModified,content
       for (var i in toSend) {
         var match = entries.where(((element) => element.exportId == i));
@@ -153,10 +202,44 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
             "NEWE${e.id}$commaSeparator${e.lastModified}$commaSeparator${e.toCsvContent}");
       }
     } else {
-      sendMessage("DONE");
+      closeConnection();
     }
 
     sendMessage("DONE");
+  }
+
+  void failedConnection(SocketException e) {
+    showModalBottomSheet(
+      context: lastContext,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Center(
+          child: Text('connection failed at ${ipController.text}:$port'),
+          // Text('error: ${e.message}'),
+        ),
+      ),
+    );
+  }
+
+  void closeConnection() {
+    sendMessage("DONE");
+    showModalBottomSheet(
+      context: lastContext,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Text('at last sync they where $totalEntriesLastSync logs'),
+            Text('of witch $sentUpdatedEntries were sent updated'),
+            Text('and $gotUpdatedEntries were received udpated'),
+            Text('so only $leftUntouched remain the same'),
+            Text('on top we sent $sentNewEntries new logs'),
+            Text('and received $gotNewEntries so'),
+            Text('there are $totalEntriesNow logs now'),
+          ],
+        ),
+      ),
+    );
   }
 
   /// msg = id,exportId
@@ -167,8 +250,12 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
     var id = int.parse(list[0]);
     var exportId = int.parse(list[1]);
     api.addExportId(id, exportId);
-    if (--totNewEntries == 0) {
-      sendMessage("DONE");
+
+    // save sync stats
+    sentNewEntries += 1;
+
+    if (sentNewEntries == totNewEntries) {
+      closeConnection();
     }
   }
 
@@ -180,9 +267,12 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
         lm: int.parse(list[1]),
         lf: LogFields(
           list[2],
-          category: LogCategory.values[int.tryParse(list[4]) ?? 0],
           dc: DateTime.parse(list[3]),
+          category: LogCategory.values[int.tryParse(list[4]) ?? 0],
         ));
+
+    // save sync stats
+    gotNewEntries += 1;
   }
 
   /// update entry in entries
@@ -197,6 +287,9 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
         dc: DateTime.parse(list[3]),
       ),
     );
+
+    // save sync stats
+    gotUpdatedEntries += 1;
   }
 
   Future deleteSyncData() async {
