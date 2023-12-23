@@ -31,6 +31,7 @@
 ## to do
 
 * [ ] review layout of settings
+* [ ] separate trash viewmodel from main viewmodel
 
 ## to thihnk
 
