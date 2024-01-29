@@ -72,6 +72,13 @@ class LogView extends StatelessWidget {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
+                LifeIconButton(
+                  onTap: model.handleSave,
+                  onLongPress: model.handleSaveLongPress,
+                  iconData: CupertinoIcons.check_mark,
+                  color: model.categorySelection.color,
+                ),
+                const SizedBox(width: 8),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
@@ -83,13 +90,6 @@ class LogView extends StatelessWidget {
                       style: const TextStyle(color: Colors.white),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                LifeIconButton(
-                  onTap: model.handleSave,
-                  onLongPress: model.handleSaveLongPress,
-                  iconData: CupertinoIcons.check_mark,
-                  color: model.categorySelection.color,
                 ),
                 const SizedBox(width: 8),
                 LifeIconButton(

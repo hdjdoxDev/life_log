@@ -267,7 +267,7 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
         lm: int.parse(list[1]),
         lf: LogFields(
           list[2],
-          dc: DateTime.parse(list[3]),
+          dateCreated: DateTime.parse(list[3]),
           category: LogCategory.values[int.tryParse(list[4]) ?? 0],
         ));
 
@@ -284,7 +284,7 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
       lf: LogFields(
         list[2],
         category: LogCategory.values[int.parse(list[4])],
-        dc: DateTime.parse(list[3]),
+        dateCreated: DateTime.parse(list[3]),
       ),
     );
 

@@ -10,16 +10,16 @@ import '../share/viewmodel.dart';
 class LogFields implements ISqflFields {
   String msg = "";
   LogCategory category = LogCategory.all;
-  DateTime dateCreated = DateTime.now();
+  DateTime? dateCreated;
 
-  LogFields(this.msg, {this.category = LogCategory.all, DateTime? dc, n})
-      : dateCreated = dc ?? DateTime.now();
+  LogFields(this.msg, {this.category = LogCategory.all, this.dateCreated});
 
   @override
   Map<String, Object?> toTable() => {
         LogSqflTable.colMsg: msg,
         LogSqflTable.colCategory: category.toString(),
-        LogSqflTable.colDateCreated: dateCreated.millisecondsSinceEpoch,
+        if (dateCreated != null)
+          LogSqflTable.colDateCreated: dateCreated!.millisecondsSinceEpoch,
       };
 
   //from table
@@ -36,6 +36,8 @@ class LogFields implements ISqflFields {
   IFields update(fields) {
     if (fields is LogFields) {
       msg = fields.msg;
+      category = fields.category;
+      dateCreated = fields.dateCreated;
     }
     return this;
   }
@@ -54,16 +56,8 @@ class LogEntry extends LogFields implements ISqflEntry {
   @override
   LogFields get fields => this;
 
-  LogEntry(
-      {required String msg,
-      required this.id,
-      this.exportId,
-      required this.lastModified,
-      LogCategory category = LogCategory.all})
-      : super(msg, category: category, dc: DateTime.now());
-
   LogEntry.fromFields(LogFields sf, this.id, this.exportId, this.lastModified)
-      : super(sf.msg, category: sf.category, dc: sf.dateCreated);
+      : super(sf.msg, category: sf.category, dateCreated: sf.dateCreated);
 
   LogEntry.fromTable(Map<String, dynamic> map)
       : id = map[IDatabaseTable.colId],
@@ -71,7 +65,7 @@ class LogEntry extends LogFields implements ISqflEntry {
         exportId = map[IDatabaseTable.colExportId],
         super.fromTable(map);
 
-  DateTime get time => dateCreated;
+  DateTime get time => dateCreated ?? DateTime(2015, 23, 12);
 
   String get readableTime =>
       "${dateTimeString(time)} - ${weekDaysShort(time.weekday)}";
@@ -125,12 +119,12 @@ class LogSqflTable extends IDatabaseTable {
         );
 
   List<LogFields> get initialMsgs => [
-        LogFields("Hi! We are log entries :)"),
-        LogFields("Down there you can type more :3"),
-        LogFields("That trash can on our right kills us :("),
-        LogFields("Long press on it to see the cimitery"),
-        LogFields("To activate search mode you need to find the gray lens"),
-      ];
+        "Hi! We are log entries :)",
+        "Down there you can type more :3",
+        "That trash can on our right kills us :(",
+        "Long press on it to see the cimitery",
+        "To activate search mode you need to find the gray lens",
+      ].map((e) => LogFields(e, dateCreated: now)).toList();
 }
 
 enum LogCategory {

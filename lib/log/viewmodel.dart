@@ -105,8 +105,8 @@ class LogModel extends IScrollableModel<NoModelArgs> {
 
     // save new log
     else {
-      await api.addLogEntry(
-          LogFields(controller.text, category: _categorySelection));
+      await api.addLogEntry(LogFields(controller.text,
+          category: _categorySelection, dateCreated: DateTime.now()));
     }
 
     controller.text = query;

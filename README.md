@@ -25,12 +25,16 @@
   * [x] swipes
   * [x] whole screen
   * [x] test whole screen
-  * [ ] change sequence by some hint - like a color extraction that determines the right sequence
+  * [ ] change sequence every time and put hint some hint - like a color extraction that determines the right sequence
   * [ ] mac with different locking mechanism
 
 ## to do
 
 * [ ] review layout of settings
+* [ ] move search button to the left
+* [ ] add view with suggested log beginnings
+* [ ] allow complete reset of logs from server and dump on it
+* [ ] remove space on the bottom
 
 ## to thihnk
 
