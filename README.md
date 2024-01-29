@@ -12,7 +12,7 @@
 * [x] cerca anche nelle date se si scrive una data
 * [x] add clear button -> long press on the send button -> long press again to restore
 * [x] logo same color of the category
-* [x] lock screen in settings
+* [x] lock screen button in settings
 * [x] day of month and day of week in app bar
 * [x] shared preferences for ip address
 * [x] feedback on sync
@@ -27,14 +27,16 @@
   * [x] test whole screen
   * [ ] change sequence every time and put hint some hint - like a color extraction that determines the right sequence
   * [ ] mac with different locking mechanism
+* [ ] move search button to the left
+* [ ] remove space on the bottom
 
 ## to do
 
 * [ ] review layout of settings
-* [ ] move search button to the left
 * [ ] add view with suggested log beginnings
 * [ ] allow complete reset of logs from server and dump on it
-* [ ] remove space on the bottom
+* [ ] rename settings view
+* [ ] add category labels editable in settings and write the in the app bar
 
 ## to thihnk
 
