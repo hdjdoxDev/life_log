@@ -31,8 +31,8 @@ class ShareView extends StatelessWidget {
             Text(model.connection),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: model.deleteSyncData,
-              child: const Text("Reset"),
+              onPressed: () => model.dumpEntries(context),
+              child: const Text("Dump"),
             ),
             const SizedBox(height: 20),
             ElevatedButton(

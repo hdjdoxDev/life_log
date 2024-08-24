@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/model.dart';
 import '../data/sqfl.dart';
 
-enum ComState { init, sync, done }
+enum ComState { init, sync, done, dump }
 
 const commaSeparator = ";";
 const msgSeparator = "\n";
@@ -34,7 +34,8 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
 
   String residual = "";
   var ipAddressKey = "ip_address";
-
+  var deviceIdKey = "device_id";
+  var deviceId = "0";
   late BuildContext lastContext;
 
   int get totalEntriesNow => totalEntriesLastSync + gotNewEntries;
@@ -58,6 +59,11 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
     preferences = await SharedPreferences.getInstance();
     if (preferences.containsKey(ipAddressKey)) {
       ipController.text = preferences.getString(ipAddressKey)!;
+    }
+    if (preferences.containsKey(deviceIdKey)) {
+      deviceId = preferences.getString(deviceIdKey)!;
+    } else {
+      preferences.setString(deviceIdKey, deviceId);
     }
 
     setState(ViewState.idle);
@@ -134,6 +140,10 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
         if (comState == ComState.sync) {
           comState = ComState.done;
         } else if (comState == ComState.done) {
+          socket!.close();
+          socket = null;
+          comState = ComState.init;
+        } else if (comState == ComState.dump) {
           socket!.close();
           socket = null;
           comState = ComState.init;
@@ -214,7 +224,8 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
       builder: (context) => Padding(
         padding: const EdgeInsets.all(8.0),
         child: Center(
-          child: Text('connection failed at ${ipController.text}:$port'),
+          child: 
+          Text('connection failed at ${ipController.text}:$port'),
           // Text('error: ${e.message}'),
         ),
       ),
@@ -294,5 +305,34 @@ class ShareModel extends IScrollableModel<NoModelArgs> {
 
   Future deleteSyncData() async {
     await api.removeIdExport();
+  }
+
+  Future dumpEntries(BuildContext context) async {
+    lastContext = context;
+
+    comState = ComState.dump;
+
+    preferences.setString(ipAddressKey, ipController.text);
+
+    try {
+      socket = await Socket.connect(ipController.text, port);
+    } on SocketException catch (e) {
+      failedConnection(e);
+      return;
+    }
+
+    socket!.encoding = utf8;
+
+    socket!.listen(onData);
+
+    var entries = await api.getLogEntries();
+
+    sendMessage("DUMP$deviceId");
+    sendMessage("HEAD${LogEntry.csvHeaderContent}");
+    for (var e in entries) {
+      sendMessage(
+          "NEWE${e.id}$commaSeparator${e.lastModified}$commaSeparator${e.toCsvContent}");
+    }
+    sendMessage("DONE");
   }
 }

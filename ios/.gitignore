@@ -6,7 +6,7 @@
 *.perspectivev3
 **/*sync/
 .sconsign.dblite
-.tags*
+.tags* 
 **/.vagrant/
 **/DerivedData/
 Icon?
