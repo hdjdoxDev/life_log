@@ -172,6 +172,8 @@ class LogModel extends IScrollableModel<NoModelArgs> {
       controller.text = lastText;
     } else {
       lastText = controller.text;
+      Clipboard.setData(ClipboardData(text: controller.text));
+      print("saved ${controller.text} to clipboard");
       controller.clear();
     }
   }

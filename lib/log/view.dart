@@ -96,7 +96,7 @@ class LogView extends StatelessWidget {
                   iconData: CupertinoIcons.search,
                   color: model.searchingMode
                       ? model.categorySelection.color
-                      : Theme.of(context).colorScheme.background,
+                      : Theme.of(context).colorScheme.surface,
                   onTap: () => model.handleSearch(),
                 ),
                 const SizedBox(width: 8),
